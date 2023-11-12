@@ -32,8 +32,8 @@ bool user_exists(std::string user)
         delete con;
 
         return false;
-/*
-    } catch (sql::SQLException &e) {
+
+    /*} catch (sql::SQLException &e) {
     std::cout << "# ERR: SQLException in " << __FILE__;
     std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
     std::cout << "# ERR: " << e.what();

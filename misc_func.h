@@ -6,9 +6,9 @@
 
 
 //functions not directly related to querying or sql
-//will add werkzeug header for hashing passwords
+//will add werkzeug header for hashing passwords if extra time
 
-void main_menu();   //will change to a state based system so that users can move between menu states freely
+void main_menu();   //all current functions will loop back to main_menu()
 void login();
 void create_account();
 bool valid_ssn(int ssn);

@@ -4,21 +4,24 @@
 void main_menu()
 {
     int sel;
-    std::cout << "Welcome! Please select an option below:\n1)Log In \n2)Create Account\n3)Exit" << std::endl;
-    std::cin >> sel;
-    switch(sel)
+    while(true)
     {
-        case 1: 
-            login();
-            break;
-        case 2:
-            create_account();
-            break;
-        case 3:
-            std::cout << "Goodbye." << std::endl;
-            exit(0);
-            break;
-        default:std::cout << "Error: Please select a valid option." << std::endl;
+        std::cout << "Welcome! Please select an option below:\n1)Log In \n2)Create Account\n3)Exit" << std::endl;
+        std::cin >> sel;
+        switch(sel)
+        {
+            case 1: 
+                login();
+                break;
+            case 2:
+                create_account();
+                break;
+            case 3:
+                std::cout << "Goodbye." << std::endl;
+                exit(0);
+                break;
+            default:std::cout << "Error: Please select a valid option." << std::endl;
+        }
     }
 }
 void login()
@@ -34,7 +37,7 @@ void login()
         if(user == "Exit" || user == "exit")
         {
             std::cout << "Successfully exited." << std::endl;
-            exit(0);
+            return;
         }
     }
     
