@@ -7,4 +7,4 @@ This application will function as a method of accessing products and materials a
 3. Call "run" or "run.exe"
 4. After running program, enter "make clean" before exiting console
 
-* Files in /lib64 maybe need to be copied into local/lib onto user's device before successful compilation *
+Files in /lib64 maybe need to be copied into local/lib onto user's device before successful compilation*
