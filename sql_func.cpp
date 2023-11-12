@@ -1,39 +1,44 @@
 #include "sql_func.h"
 
-void sql_connect()
+
+bool user_exists(std::string user)
 {
-    try{
-    sql::Driver *driver;
-    sql::Connection *con;
-    sql::Statement *stmt;
-    sql::ResultSet *res;
+    /*try
+    {*/
+        sql::Driver *driver;
+        sql::Connection *con;
+        sql::Statement *stmt;
+        sql::ResultSet *res;
 
-    /* Create a connection */
-    driver = get_driver_instance();
-    con = driver->connect("tcp://127.0.0.1:3306", "root", "root");
-    /* Connect to the MySQL test database */
-    con->setSchema("test");
+        driver = get_driver_instance();
+        con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+        con->setSchema("InventoryDB");
 
-    stmt = con->createStatement();
-    res = stmt->executeQuery("SELECT 'Hello World!' AS _message");
-    while (res->next()) {
-        std::cout << "\t... MySQL replies: ";
-        /* Access column data by alias or column name */
-        std::cout << res->getString("_message") << std::endl;
-        std::cout << "\t... MySQL says it again: ";
-        /* Access column data by numeric offset, 1 is the first column */
-        std::cout << res->getString(1) << std::endl;
-    }
-    delete res;
-    delete stmt;
-    delete con;
+        stmt = con->createStatement();
+        res = stmt->executeQuery(" SELECT * FROM employee");
+        while(res -> next())
+        {
+            if(user == res->getString(1))
+            {
+                delete res;
+                delete stmt;
+                delete con;
+                return true;
+            }
+        }
+    
+        delete res;
+        delete stmt;
+        delete con;
 
+        return false;
+/*
     } catch (sql::SQLException &e) {
     std::cout << "# ERR: SQLException in " << __FILE__;
-    std::cout << "(" << __FUNCTION__ << ") on line " »
-        << __LINE__ << endl;
+    std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
     std::cout << "# ERR: " << e.what();
     std::cout << " (MySQL error code: " << e.getErrorCode();
     std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
-    }
+    }*/
+
 }

@@ -1,13 +1,22 @@
 #ifndef SQL_FUNC_H
 #define SQL_FUNC_H
 
-#include "mysql_connection.h"
-#include <jdbc/cppconn/driver.h>
-#include <jdbc/cppconn/exception.h>
-#include <jdbc/cppconn/resultset.h>
-#include <jdbc/cppconn/statement.h>
+#include <iostream>
 
-void sql_connect();
+#include "mysql_connection.h"
+
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+
+bool user_exists(std::string user);
+/*
+create querying fucntions
+
+*/
+
+
 
 
 #endif
