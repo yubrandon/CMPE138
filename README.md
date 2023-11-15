@@ -8,4 +8,4 @@ This application will function as a method of accessing products and materials a
 4. Application can then be accessed through the console line.
 5. After running program, enter "make clean" before exiting console
 
-* Files in /lib64 maybe need to be copied into local/lib onto user's device before successful compilation
+* Files in app/lib64 maybe need to be copied into local/lib onto user's device before successful compilation
