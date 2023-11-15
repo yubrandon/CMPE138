@@ -3,14 +3,14 @@
 #define SQL_FUNC_H
 
 #include <iostream>
-
+#include "spdlog/sinks/basic_file_sink.h"
 #include "mysql_connection.h"
-
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
+
 
 /*SQL Querying Functions*/
 bool user_exists(std::string user);

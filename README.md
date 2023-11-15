@@ -5,6 +5,7 @@ This application will function as a method of accessing products and materials a
 1. Open the app directory in the console after cloning
 2. Enter "make"
 3. Call "run" or "run.exe"
-4. After running program, enter "make clean" before exiting console
+4. Application can then be accessed through the console line.
+5. After running program, enter "make clean" before exiting console
 
 * Files in /lib64 maybe need to be copied into local/lib onto user's device before successful compilation
