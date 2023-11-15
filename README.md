@@ -1,5 +1,5 @@
 # CMPE138
-This application will function as a method of accessing products and materials available within a company, as well as track the status of inspections on incoming products and materials.
+This application will function as a method of accessing products and materials available worked on within a company, as well as track the status of inspections on incoming products and materials.
 
 ## Invoking make
 1. Open the app directory in the console after cloning
