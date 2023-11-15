@@ -7,8 +7,8 @@ endif
 CXX=g++
 CFLAGS= -g -std=c++11 -I./include/jdbc
 LDFLAGS=-g -std=c++11 -L./lib64 -lmysqlcppconn 
-CFILES= main.cpp misc_func.cpp sql_func.cpp
-OBJECTS = main.o misc_func.o sql_func.o
+CFILES= $(wildcard *.cpp)
+OBJECTS = $(patsubst %.cpp, %.o, $(CFILES))
 
 SHARED_LIB=-L./lib64
 

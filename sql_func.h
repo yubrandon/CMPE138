@@ -10,11 +10,8 @@
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 
+/*SQL Querying Functions*/
 bool user_exists(std::string user);
-/*
-create querying fucntions
-
-*/
 
 
 
