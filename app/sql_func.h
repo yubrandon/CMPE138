@@ -3,7 +3,8 @@
 #define SQL_FUNC_H
 
 #include <iostream>
-#include "spdlog/sinks/basic_file_sink.h"
+#include "include/spdlog/sinks/basic_file_sink.h"
+
 #include "mysql_connection.h"
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>

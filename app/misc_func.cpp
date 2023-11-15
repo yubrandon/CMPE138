@@ -1,6 +1,14 @@
 /* SJSU CMPE 138 FALL 2023 TEAM 5 */
 #include "misc_func.h"
+int LOGIN_COUNT = 0;
+int CREATE_COUNT = 0;
 
+void initialize()
+{
+    //include sql db intialization here
+
+
+}
 
 void main_menu()
 {
@@ -27,12 +35,17 @@ void main_menu()
 }
 void login()
 {
+    LOGIN_COUNT++;
+    auto file_logger = spdlog::basic_logger_mt("login" + std::to_string(LOGIN_COUNT),"../logfile.txt");
+    file_logger->info("login begin");
+
     std::string user;
     std::cout << "Please enter your username: ";
     std::cin >> user;
     //verify user exists in db
     while(!(user_exists(user)))
     {
+        file_logger->info("login username invalid");
         std::cout << "User does not exist, please enter a valid username, or 'exit' to return: ";
         std::cin >> user;
         if(user == "Exit" || user == "exit")
@@ -41,7 +54,9 @@ void login()
             return;
         }
     }
-    
+
+    file_logger->info("login username passed");
+
     std::cout << "Please enter your password: ";
     std::string pw;
     std::cin >> pw;
@@ -65,10 +80,13 @@ void login()
 }
 void create_account()
 {
+    CREATE_COUNT++;
     int ssn;
     std::string ssn_str,name,user,pw;
-
     char temp;
+
+    auto file_logger = spdlog::basic_logger_mt("create_account" + std::to_string(CREATE_COUNT),"../logfile.txt");
+    file_logger->info("create account begin");
 
     std::cout << "Enter your SSN: ";
     std::cin >> ssn_str;
