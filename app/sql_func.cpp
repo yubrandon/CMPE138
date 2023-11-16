@@ -8,28 +8,27 @@ bool user_exists(std::string user)
     {*/
         sql::Driver *driver;
         sql::Connection *con;
-        sql::Statement *stmt;
         sql::ResultSet *res;
+        sql::PreparedStatement *pstmt;
 
         driver = get_driver_instance();
         con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
         con->setSchema("InventoryDB");
 
-        stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT username FROM employee");
-        while(res -> next())
+        pstmt = con->prepareStatement("SELECT username FROM employee WHERE EXISTS(SELECT username FROM employee WHERE username = ?)");
+        pstmt->setString(1,user);
+        res = pstmt->executeQuery();
+
+        if(res -> next())
         {
-            if(user == res->getString(1))
-            {
-                delete res;
-                delete stmt;
-                delete con;
-                return true;
-            }
+            delete res;
+            delete pstmt;
+            delete con;
+            return true;
         }
     
         delete res;
-        delete stmt;
+        delete pstmt;
         delete con;
 
         return false;
@@ -50,7 +49,6 @@ bool ssn_exists(int ssn)
     {*/
         sql::Driver *driver;
         sql::Connection *con;
-        sql::Statement *stmt;
         sql::ResultSet *res;
         sql::PreparedStatement *pstmt;
 
@@ -58,23 +56,20 @@ bool ssn_exists(int ssn)
         con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
         con->setSchema("InventoryDB");
 
-        stmt = con->createStatement();
-        res = stmt->executeQuery("SELECT ssn FROM employee");
-        while(res -> next())
+        pstmt = con->prepareStatement("SELECT ssn FROM employee WHERE EXISTS (SELECT ssn FROM employee WHERE ssn = ?)");
+        pstmt->setInt(1,ssn);
+        res = pstmt->executeQuery();
+        if(res -> next())
         {
-            if(ssn == res->getInt("ssn"))
-            {
-                delete res;
-                delete stmt;
-                delete con;
-                return true;
-            }
+            delete res;
+            delete pstmt;
+            delete con;
+            return true;
         }
     
         delete res;
-        delete stmt;
+        delete pstmt;
         delete con;
-
         return false;
 
     /*} catch (sql::SQLException &e) {
@@ -92,26 +87,27 @@ bool verify_user(std::string user, std::string pw)
     sql::Connection *con;
     sql::Statement *stmt;
     sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
 
     driver = get_driver_instance();
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    stmt = con->createStatement();
-    res = stmt->executeQuery("SELECT username,password FROM employee");
+    pstmt = con->prepareStatement("SELECT username,password FROM employee WHERE EXISTS (SELECT username,password FROM employee WHERE username = ? AND password = ?)");
+    pstmt->setString(1,user);
+    pstmt->setString(2,pw);
 
-    while(res->next())
+    res = pstmt->executeQuery();
+
+    if(res->next())
     {
-        if(user == res->getString(1) && pw == res->getString(2))
-        {
-            delete stmt;
-            delete res;
-            delete con;
-            return true;
-        }
+        delete pstmt;
+        delete res;
+        delete con;
+        return true;
     }
 
-    delete stmt;
+    delete pstmt;
     delete res;
     delete con;
     return false;
