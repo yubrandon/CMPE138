@@ -34,7 +34,7 @@ void login();
 void create_account();
 bool valid_ssn(std::string ssn);
 
-
+void log_line();
 /*
 functions to show menu for each entity type
 _view()

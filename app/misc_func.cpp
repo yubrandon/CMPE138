@@ -36,8 +36,8 @@ void main_menu()
 void login()
 {
     LOGIN_COUNT++;
-    auto file_logger = spdlog::basic_logger_mt("login" + std::to_string(LOGIN_COUNT),"../logfile.txt");
-    file_logger->info("login begin");
+    auto file_logger = spdlog::basic_logger_mt("login_" + std::to_string(LOGIN_COUNT),"../logfile.txt");
+    file_logger->info("start");
 
     std::string user;
     std::cout << "Please enter your username: ";
@@ -45,17 +45,16 @@ void login()
     //verify user exists in db
     while(!(user_exists(user)))
     {
-        file_logger->info("login username invalid");
+        file_logger->info("invalid username input");
         std::cout << "User does not exist, please enter a valid username, or 'exit' to return: ";
         std::cin >> user;
         if(user == "Exit" || user == "exit")
         {
+            file_logger->info("exit at username input");
             std::cout << "Returning to main menu." << std::endl;
             return;
         }
     }
-
-    file_logger->info("login username passed");
 
     std::cout << "Please enter your password: ";
     std::string pw;
@@ -64,10 +63,17 @@ void login()
 
     while(!(verify_user(user,sha256(pw))))
     {
+        file_logger->info("invalid password input");
         std::cout << "Invalid password, try again or type 'exit' to return to the main menu: ";
         std::cin >> pw;
+        if(user == "Exit" || user == "exit")
+        {
+            file_logger->info("exit at password input");
+            std::cout << "Returning to main menu." << std::endl;
+            return;
+        }
     }
-
+    file_logger->info("complete");
     std::cout << "Successful login!" << std::endl;
     /*
     call function that displays menus based on entity
@@ -81,21 +87,22 @@ void login()
 void create_account()
 {
     CREATE_COUNT++;
+    auto file_logger = spdlog::basic_logger_mt("create_account_" + std::to_string(CREATE_COUNT),"../logfile.txt");
+    file_logger->info("start");
     int ssn;
     std::string ssn_str,name,user,pw;
     char temp;
-
-    auto file_logger = spdlog::basic_logger_mt("create_account" + std::to_string(CREATE_COUNT),"../logfile.txt");
-    file_logger->info("create account begin");
 
     std::cout << "Enter your SSN: ";
     std::cin >> ssn_str;
     while (!valid_ssn(ssn_str))
     {
+        file_logger->info("invalid ssn input");
         std::cout << "Invalid SSN, input a new value, or type 'exit' to return to the main menu: ";
         std::cin >> ssn_str;
         if(user == "Exit" || user == "exit")
         {
+            file_logger->info("exit at invalid ssn");
             std::cout << "Returning to main menu." << std::endl;
             return;
         }
@@ -105,24 +112,16 @@ void create_account()
 
     while(ssn_exists(ssn))
     {
-        std::cout << "An account for this SSN already exists, would you like to try again? (Y/N)\n";
-        std::cin >> temp;
-        switch (temp)
+        file_logger->info("duplicate ssn input");
+        std::cout << "An account for this SSN already exists, try again or type 'exit' to return to the main menu: \n";
+        std::cin >> ssn_str;
+        if(ssn_str == "Exit" || ssn_str == "exit")
         {
-        case 'Y':
-            std::cout << "\n";
-        case 'y':
-            std::cout << "\n";
-        case 'N': 
-            std::cout << "Returning to main menu.\n";
+            file_logger->info("exit at duplicate ssn input");
+            std::cout << "Returning to main menu." << std::endl;
             return;
-        case 'n': 
-            std::cout << "Returning to main menu.\n";
-            return;
-        default:
-            std::cout << "Please enter Y/N.\n";
-            std::cin >> temp;
         }
+        ssn = std::stoi(ssn_str);
     }
     std::cout << "Enter your name: ";
     std::cin >> name;
@@ -131,6 +130,7 @@ void create_account()
     std::cin >> user;
     while(user_exists(user))
     {
+        file_logger->info("duplicate username input");
         std::cout << "Username has already been taken, please enter a new username." << std::endl;
         std::cout << "If you would like to cancel your account creation, type 'exit' " << std::endl;
         std::cin >> user;
@@ -148,7 +148,7 @@ void create_account()
     std::string hashed_pw = sha256(pw);
 
     create_user(ssn, name, user,hashed_pw);
-
+    file_logger->info("complete");
     std::cout << "Account successfully created!" << std::endl;
 
     //returns to main menu after completion
