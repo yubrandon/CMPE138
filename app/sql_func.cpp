@@ -6,6 +6,7 @@ bool user_exists(std::string user)
 {
     /*try
     {*/
+        //Create SQL Connection
         sql::Driver *driver;
         sql::Connection *con;
         sql::ResultSet *res;
@@ -15,10 +16,12 @@ bool user_exists(std::string user)
         con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
         con->setSchema("InventoryDB");
 
+        //Query DB to see if username input exists in DB
         pstmt = con->prepareStatement("SELECT username FROM employee WHERE EXISTS(SELECT username FROM employee WHERE username = ?)");
         pstmt->setString(1,user);
         res = pstmt->executeQuery();
 
+        //If query result exists, return true - username is taken
         if(res -> next())
         {
             delete res;
@@ -26,7 +29,7 @@ bool user_exists(std::string user)
             delete con;
             return true;
         }
-    
+        //Else return false
         delete res;
         delete pstmt;
         delete con;
@@ -47,6 +50,7 @@ bool ssn_exists(int ssn)
 {
     /*try
     {*/
+        //Create SQL Connection
         sql::Driver *driver;
         sql::Connection *con;
         sql::ResultSet *res;
@@ -56,9 +60,12 @@ bool ssn_exists(int ssn)
         con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
         con->setSchema("InventoryDB");
 
+        //Query DB to see if ssn input exists in Db
         pstmt = con->prepareStatement("SELECT ssn FROM employee WHERE EXISTS (SELECT ssn FROM employee WHERE ssn = ?)");
         pstmt->setInt(1,ssn);
         res = pstmt->executeQuery();
+
+        //If query result exists, return true - ssn is already registered in database
         if(res -> next())
         {
             delete res;
@@ -66,7 +73,7 @@ bool ssn_exists(int ssn)
             delete con;
             return true;
         }
-    
+        //Else return false
         delete res;
         delete pstmt;
         delete con;
@@ -83,6 +90,7 @@ bool ssn_exists(int ssn)
 
 bool verify_user(std::string user, std::string pw)
 {
+    //Create SQL Connection
     sql::Driver *driver;
     sql::Connection *con;
     sql::Statement *stmt;
@@ -92,13 +100,13 @@ bool verify_user(std::string user, std::string pw)
     driver = get_driver_instance();
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
-
+    //Query DB for tuples that have user-inputted username and password
     pstmt = con->prepareStatement("SELECT username,password FROM employee WHERE EXISTS (SELECT username,password FROM employee WHERE username = ? AND password = ?)");
     pstmt->setString(1,user);
     pstmt->setString(2,pw);
 
     res = pstmt->executeQuery();
-
+    //If query result exists, return true - user and password combination are valid
     if(res->next())
     {
         delete pstmt;
@@ -106,7 +114,7 @@ bool verify_user(std::string user, std::string pw)
         delete con;
         return true;
     }
-
+    //Else return false
     delete pstmt;
     delete res;
     delete con;
@@ -117,6 +125,7 @@ void create_user(int ssn,std::string name, std::string user, std::string pw)
 {
     /*try
     {*/
+        //Create SQL Connection
         sql::Driver *driver;
         sql::Connection *con;
         sql::PreparedStatement *pstmt;
@@ -128,10 +137,12 @@ void create_user(int ssn,std::string name, std::string user, std::string pw)
         con->setSchema("InventoryDB");
 
         stmt = con -> createStatement();
+        //Save count of employees to assign ID for new employee
         res = stmt ->executeQuery("SELECT COUNT(*)+1 FROM employee");
         res->next();
         int id = res->getInt(1);
 
+        //Create new employee tuple with user inputted values
         pstmt = con->prepareStatement("INSERT INTO employee VALUES (?,?,?,?,?)");
         pstmt -> setInt(1,ssn);
         pstmt -> setInt(2,id);

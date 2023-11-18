@@ -6,7 +6,7 @@
 
 int main(void)
 {
-    initialize();
+    //initialize();
     main_menu();
     return 0;
 }
