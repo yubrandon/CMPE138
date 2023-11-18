@@ -3,6 +3,7 @@
 #define MISC_FUNC_H
 
 #include <iostream>
+#include <fstream>
 #include "global_variables.h"
 #include "sql_func.h"
 #include "sha256.h"
@@ -26,15 +27,13 @@
 
 
 
-/*Non-SQL related functions*/
-void initialize();  //initialize db and log file
-
-void main_menu();   //all current functions will loop back to main_menu()
-void login();
-void create_account();
+void initialize();                  //initialize db
+void main_menu();                   //interactive menu to navigate options
+void login();                       //login to account that is saved in database
+void create_account();              //create account for user and save to database if successful
 bool valid_ssn(std::string ssn);
 
-void log_line();
+
 /*
 functions to show menu for each entity type
 _view()
@@ -43,5 +42,6 @@ etc.
 
 
 */
+
 
 #endif

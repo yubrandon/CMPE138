@@ -14,11 +14,11 @@
 
 
 /*SQL Querying Functions*/
-bool user_exists(std::string user);
-bool ssn_exists(int ssn);
+bool user_exists(std::string user);     //return boolean indicating if username exists in db
+bool ssn_exists(int ssn);               //return boolean indicating if ssn exists in db
 
-bool verify_user(std::string user, std::string pw);
-void create_user(int ssn, std::string name, std::string user, std::string pw);
+bool verify_user(std::string user, std::string pw);         //return boolean indicating if username and password input exist in a tuple
+void create_user(int ssn, std::string name, std::string user, std::string pw);  //add tuple to db using user inputs
 
 
 
