@@ -179,7 +179,7 @@ void create_account()
             std::cin >> ssn_str;
 
             //Offer option to retry or return to main menu
-            if(user == "Exit" || user == "exit")
+            if(ssn_str == "Exit" || ssn_str == "exit")
             {
                 //Log exit event
                 file_logger->info("exit at invalid ssn");

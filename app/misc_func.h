@@ -33,6 +33,7 @@ void login();                       //login to account that is saved in database
 void create_account();              //create account for user and save to database if successful
 bool valid_ssn(std::string ssn);
 
+
 /*
 functions to show menu for each entity type
 _view()
@@ -41,5 +42,6 @@ etc.
 
 
 */
+
 
 #endif
