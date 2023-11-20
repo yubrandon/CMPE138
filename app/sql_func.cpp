@@ -203,8 +203,9 @@ void view_IQC_list()
         
     //prepare SQL statement
     stmt = con->createStatement();
-    res = stmt->executeQuery("SELECT * FROM Material WHERE insp_area = 'IQC'");
+    res = stmt->executeQuery("SELECT * FROM INSP_REQ_AREA WHERE Insp_area = 'IQC'");
     
+    //acquire PN, then use pn to reference part that is being worked on?
     while (res->next())
     {
         std::cout << res->getString(1);
@@ -217,7 +218,7 @@ void view_IQC_list()
 
 void view_OQC_list()
 {
-         //Create SQL Connection
+    //Create SQL Connection
     sql::Driver *driver;
     sql::Connection *con;
     sql::ResultSet *res;
@@ -229,7 +230,7 @@ void view_OQC_list()
         
     //prepare SQL statement
     stmt = con->createStatement();
-    res = stmt->executeQuery("SELECT * FROM Material WHERE insp_area = 'OQC'");
+    res = stmt->executeQuery("SELECT * FROM INSP_REQ_AREA WHERE insp_area = 'OQC'");
     
     while (res->next())
     {
