@@ -14,11 +14,13 @@
 
 
 /*SQL Querying Functions*/
+void init();
 bool user_exists(std::string user);     //return boolean indicating if username exists in db
 bool ssn_exists(int ssn);               //return boolean indicating if ssn exists in db
 
 bool verify_user(std::string user, std::string pw);         //return boolean indicating if username and password input exist in a tuple
 void create_user(int ssn, std::string name, std::string user, std::string pw);  //add tuple to db using user inputs
+
 
 void view_IQC_list();
 void create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size);

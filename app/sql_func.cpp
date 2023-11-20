@@ -1,6 +1,26 @@
 /* SJSU CMPE 138 FALL 2023 TEAM 5 */
 #include "sql_func.h"
 
+void init()
+{
+    //Create MySQL connection
+    sql::Driver *driver;
+    sql::Connection *con;
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+
+    //Load SQL script
+    std::ifstream script("../init.sql");
+    std::string sql((std::istreambuf_iterator<char>(script)),std::istreambuf_iterator<char>());
+
+    //Create statement and execute script
+    sql::Statement *stmt = con->createStatement();
+    stmt->execute(sql);
+
+    //Free storage
+    delete stmt;
+    delete con;
+}
 
 bool user_exists(std::string user)
 {
@@ -185,14 +205,14 @@ void view_IQC_list()
     stmt = con->createStatement();
     res = stmt->executeQuery("SELECT * FROM Material WHERE insp_area = 'IQC'");
     
-    while (res->next)
+    while (res->next())
     {
-        std::cout << res->getString();
+        std::cout << res->getString(1);
     }
     
-    delete *res;
-    delete *stmt;
-    delete *con;
+    delete res;
+    delete stmt;
+    delete con;
 }
 
 void view_OQC_list()
@@ -204,7 +224,7 @@ void view_OQC_list()
     sql::Statement *stmt;
     
     driver = get_driver_instance();
-        con = driver->connect("", "", "");
+        con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
         con->setSchema("");
         
     //prepare SQL statement
@@ -216,9 +236,9 @@ void view_OQC_list()
         std::cout << res->getString(1);
     }
     
-    delete *res;
-    delete *stmt;
-    delete *con;
+    delete res;
+    delete stmt;
+    delete con;
 // }
 
 // void header::create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size)

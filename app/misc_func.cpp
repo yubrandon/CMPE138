@@ -5,26 +5,8 @@ int CREATE_COUNT = 0;
 
 void initialize()
 {
-    //Initialize the database
-
-    //Create MySQL connection
-    sql::Driver *driver;
-    sql::Connection *con;
-    driver = get_driver_instance();
-    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
-
-    //Load SQL script
-    std::ifstream script("../init.sql");
-    std::string sql((std::istreambuf_iterator<char>(script)),std::istreambuf_iterator<char>());
-
-    //Create statement and execute script
-    sql::Statement *stmt = con->createStatement();
-    stmt->execute(sql);
-
-    //Free storage
-    delete stmt;
-    delete con;
-
+    //Initialize the database; defined in sql_func
+    init();
 }
 
 void main_menu()
