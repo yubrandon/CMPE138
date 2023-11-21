@@ -21,5 +21,14 @@ bool verify_user(std::string user, std::string pw);         //return boolean ind
 void create_user(int ssn, std::string name, std::string user, std::string pw);  //add tuple to db using user inputs
 
 
+void view_IQC_list();
+void create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size);
+bool approve_inspection(int insp_num);
+void view_inspection(int insp_num);
+void move_to_IPQC(int pn);
+
+void receive_material(int pn);
+void backflush_product(int pn);
+void move_to_IQC(int pn);
 
 #endif

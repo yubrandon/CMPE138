@@ -237,7 +237,6 @@ bool valid_ssn(std::string str)
 
 
 
-
 void loginas_IQC_inspector()
 {
     display_IQCinsp_menu();
