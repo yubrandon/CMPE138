@@ -196,14 +196,14 @@ void view_IQC_list()
     sql::Connection *con;
     sql::ResultSet *res;
     sql::Statement *stmt;
-    
+        
     driver = get_driver_instance();
         con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
         con->setSchema("InventoryDB");
-        
+
     //prepare SQL statement
     stmt = con->createStatement();
-    res = stmt->executeQuery("SELECT * FROM INSP_REQ_AREA WHERE Insp_area = 'IQC'");
+        res = stmt->executeQuery("SELECT * FROM INSP_REQ_AREA WHERE Insp_area = 'IQC'");
     
     //acquire PN, then use pn to reference part that is being worked on?
     while (res->next())
@@ -215,7 +215,7 @@ void view_IQC_list()
     delete stmt;
     delete con;
 }
-
+    
 void view_OQC_list()
 {
     //Create SQL Connection
@@ -239,7 +239,7 @@ void view_OQC_list()
     
     delete res;
     delete stmt;
-    delete con;
+    delete con;   
 }
 
 // void header::create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size)
@@ -259,7 +259,7 @@ void view_OQC_list()
 
 // void header::move_to_IPQC(int pn)
 // {
-    
+//      no longer needed, implemented in approve_inspection
 // }
 
 // void header::receive_material(int pn)
