@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "global_variables.h"
 #include "sql_func.h"
 #include "sha256.h"
@@ -33,7 +34,10 @@ void login();                       //login to account that is saved in database
 void create_account();              //create account for user and save to database if successful
 bool valid_ssn(std::string ssn);
 
-
+//Supervisor
+void view_inventory(int dnum);      //allows supervisor to view materials and materials for their department
+void view_inspections(int dnum);    //view inspections for department
+void view_subordinate(int ssn);    //view subordinates under this employee
 
 void loginas_IQC_inspector();
 void loginas_OQC_inspector();

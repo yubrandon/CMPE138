@@ -3,6 +3,7 @@
 #define SQL_FUNC_H
 
 #include <iostream>
+#include <fstream>
 #include "include/spdlog/sinks/basic_file_sink.h"
 
 #include "mysql_connection.h"
@@ -21,6 +22,9 @@ bool ssn_exists(int ssn);               //return boolean indicating if ssn exist
 bool verify_user(std::string user, std::string pw);         //return boolean indicating if username and password input exist in a tuple
 void create_user(int ssn, std::string name, std::string user, std::string pw);  //add tuple to db using user inputs
 
+std::vector<std::string> get_inventory(int dnum);
+std::vector<std::string> get_inspections(int dnum);
+std::vector<std::string> get_subordinate(int ssn);
 
 void view_IQC_list();
 void create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size);

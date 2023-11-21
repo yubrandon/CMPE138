@@ -228,11 +228,11 @@ void loginas_OQC_inspector()
 {
     display_OQCinsp_menu();
 }
-
+/*
 void loginas_technician()
 {
     display_tech_menu();
-}
+}*/
 
 void loginas_QAdirector()
 {
@@ -361,7 +361,7 @@ void display_OQCinsp_menu()
 /* ------------------------------------------------------------------------ */
 
 //Display menu options for QA director
-void display_QAdir_menu();
+void display_QAdir_menu()
 {
     int option;
     
@@ -398,10 +398,10 @@ void display_QAdir_menu();
                     std::cout << "add_product();\n";
                     break;
                     
-                case 2:
+                case 4:
                     std::cout << "approve_inspection();\n";
                     break;
-                case 3:
+                case 5:
                     std::cout << "Goodbye!\n";
                     goto exitwhileloop;
             }
@@ -416,7 +416,7 @@ void display_QAdir_menu();
 /* ------------------------------------------------------------------------ */
 
 //Display menu options for inventory associate
-void display_invassoc_menu();
+void display_invassoc_menu()
 {
     int option;
     

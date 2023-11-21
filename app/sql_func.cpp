@@ -10,12 +10,12 @@ void init()
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
 
     //Load SQL script
-    std::ifstream script("../init.sql");
-    std::string sql((std::istreambuf_iterator<char>(script)),std::istreambuf_iterator<char>());
+    std::ifstream sqlFile("../init.sql");
+    std::string sqlScript((std::istreambuf_iterator<char>(sqlFile)),std::istreambuf_iterator<char>());
 
     //Create statement and execute script
     sql::Statement *stmt = con->createStatement();
-    stmt->execute(sql);
+    stmt->execute(sqlScript);
 
     //Free storage
     delete stmt;
@@ -240,7 +240,7 @@ void view_OQC_list()
     delete res;
     delete stmt;
     delete con;
-// }
+}
 
 // void header::create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size)
 // {
