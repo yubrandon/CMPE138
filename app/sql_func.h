@@ -22,8 +22,9 @@ void create_user(int ssn, std::string name, std::string user, std::string pw);  
 
 
 void view_IQC_list();
-void create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size);
-bool approve_inspection(int insp_num);
+void create_inspection();
+void add_inspection(int pn, int insp_area, std::string requirements, std::string emp_role, int qty, std::string result, std::string insp_date);
+bool approve_inspection(int insp_num, std::string insp_area);
 void view_inspection(int insp_num);
 void move_to_IPQC(int pn);
 
