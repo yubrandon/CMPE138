@@ -87,7 +87,7 @@ void login()
         }
     }
     //Log successful login
-    file_logger->info("complete");
+    file_logger->info("complete\n");
     std::cout << "Successful login!" << std::endl;
     /*
     call function that displays menus based on entity
@@ -206,7 +206,7 @@ void create_account()
     create_user(ssn, name, user,hashed_pw);
 
     //Log successful creation
-    file_logger->info("complete");
+    file_logger->info("complete\n");
     std::cout << "Account successfully created!" << std::endl;
 
     //Return to main menu after completion
