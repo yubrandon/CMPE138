@@ -85,8 +85,8 @@ CREATE TABLE INSP_AREA{
 
 CREATE TABLE INSP_REQ_RES{
     Insp_num int,
-    Insp_desc varchar(50),
-    res varchar(50)
+    Insp_req varchar(50),
+    Insp_res varchar(50)
 }
 
 -- Sample state insertion
