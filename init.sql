@@ -44,7 +44,6 @@ CREATE TABLE STORAGE_LOCATION(
     INSP int,
     STORES int,
     WIP int,
-    SHIP int,
     FGI int
 );
 
@@ -52,6 +51,7 @@ CREATE TABLE PRODUCT(
     Pr_num int,
     Pr_desc varchar(50),
     STORES int,
+    SHIP int,
     FGI int
 );
 
