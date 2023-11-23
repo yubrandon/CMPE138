@@ -31,7 +31,7 @@ void initialize();                  //initialize db
 void main_menu();                   //interactive menu to navigate options
 void login();                       //login to account that is saved in database
 void create_account();              //create account for user and save to database if successful
-bool valid_ssn(std::string ssn);
+bool valid_ssn(std::string ssn);    //checks if ssn entered is valid
 
 //Supervisor
 void view_inventory(int dnum);      //allows supervisor to view materials and materials for their department

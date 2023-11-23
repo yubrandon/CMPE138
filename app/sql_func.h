@@ -20,11 +20,12 @@
 
 /*SQL Querying Functions*/
 void db_init();
+void state_init();
 bool user_exists(std::string user);     //return boolean indicating if username exists in db
-bool ssn_exists(int ssn);               //return boolean indicating if ssn exists in db
+bool ssn_exists(std::string ssn);               //return boolean indicating if ssn exists in db
 void get_user(User *user);
 bool verify_user(std::string user, std::string pw);         //return boolean indicating if username and password input exist in a tuple
-void create_user(int ssn, std::string name, std::string user, std::string pw, std::string lname, std::string fname);  //add tuple to db using user inputs
+void create_user(std::string ssn, std::string name, std::string user, std::string pw, std::string lname, std::string fname);  //add tuple to db using user inputs
 
 std::vector<std::string> get_inventory(int dnum);
 std::vector<std::string> get_subordinate(int ssn);

@@ -3,7 +3,7 @@
 #include "sql_func.h"
 
 //Global variables
-User *currUser;
+User *currUser = new User;
 int LOGIN_COUNT = 0;
 int CREATE_COUNT = 0;
 
@@ -19,6 +19,7 @@ void initialize()
 {
     //Initialize the database
     db_init();
+    state_init();
 }
 
 void main_menu()
@@ -40,6 +41,7 @@ void main_menu()
                 break;
             case 3:
                 std::cout << "Exited." << std::endl;
+                delete currUser;
                 exit(0);
                 break;
             default:std::cout << "Error: Please select a valid option." << std::endl;
@@ -112,6 +114,7 @@ void login()
      
     
     */
+   //prints out user id,username,ssn - testing
    user_test();
 
 }
@@ -129,7 +132,6 @@ void create_account()
     //Log start of account creation process
     auto file_logger = spdlog::basic_logger_mt("create_account_" + std::to_string(CREATE_COUNT),"../logfile.txt");
     file_logger->info("start");
-    int ssn;
     std::string ssn_str,name,user,pw,lname,fname;
     char temp;
 
@@ -151,11 +153,9 @@ void create_account()
             return;
         }
     }
-    // If ssn entered is valid, save an integer version
-    ssn = std::stoi(ssn_str);
 
     //Check if SSN is registered in system
-    while(ssn_exists(ssn))
+    while(ssn_exists(ssn_str))
     {
         //If SSN already exists, log event
         file_logger->info("duplicate ssn input");
@@ -186,14 +186,9 @@ void create_account()
                 return;
             }
         }
-        //If entered value was not 'exit', check for validity, and if valid, save new value as integer for comparison
-        ssn = std::stoi(ssn_str);
     }
 
-    //If SSN is valid and doesn't exist, prompt user for: name, username, password
-    std::cout << "Enter your name: ";
-    std::cin >> name;
-
+    //If SSN is valid and doesn't exist, prompt user for: username, password, name
     std::cout << "Enter your desired username: ";
     std::cin >> user;
 
@@ -226,7 +221,7 @@ void create_account()
     std::cout << "Enter your last name: ";
     std::cin >> lname;
 
-    create_user(ssn, name, user,hashed_pw,lname,fname);
+    create_user(ssn_str, name, user,hashed_pw,lname,fname);
 
     //Log successful creation
     file_logger->info("complete\n");

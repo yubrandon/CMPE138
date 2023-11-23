@@ -58,27 +58,21 @@ bool user_exists(std::string user)
         con->setSchema("InventoryDB");
 
         //Query DB to see if username input exists in DB
-        pstmt = con->prepareStatement("SELECT username FROM employee WHERE EXISTS(SELECT username FROM employee WHERE username = ?)");
+        pstmt = con->prepareStatement("SELECT username FROM employee WHERE username = ?");
         pstmt->setString(1,user);
         res = pstmt->executeQuery();
 
-        //If query result exists, return true - username is taken
-        if(res -> next())
-        {
-            delete res;
-            delete pstmt;
-            delete con;
-            return true;
-        }
-        //Else return false
+        //Return if query result exists
+        bool valid = res -> next();
+
         delete res;
         delete pstmt;
         delete con;
 
-        return false;
+        return valid;
 }
 
-bool ssn_exists(int ssn)
+bool ssn_exists(std::string ssn)
 {
         //Create SQL Connection
         sql::Driver *driver;
@@ -91,8 +85,8 @@ bool ssn_exists(int ssn)
         con->setSchema("InventoryDB");
 
         //Query DB to see if ssn input exists in Db
-        pstmt = con->prepareStatement("SELECT ssn FROM employee WHERE EXISTS (SELECT ssn FROM employee WHERE ssn = ?)");
-        pstmt->setInt(1,ssn);
+        pstmt = con->prepareStatement("SELECT ssn FROM employee WHERE ssn = ?");
+        pstmt->setString(1,ssn);
         res = pstmt->executeQuery();
 
         //If query result exists, return true - ssn is already registered in database
@@ -131,27 +125,22 @@ bool verify_user(std::string user, std::string pw)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
     //Query DB for tuples that have user-inputted username and password
-    pstmt = con->prepareStatement("SELECT username,password FROM employee WHERE EXISTS (SELECT username,password FROM employee WHERE username = ? AND password = ?)");
-    pstmt->setString(1,user);
-    pstmt->setString(2,pw);
-
+    pstmt = con->prepareStatement("SELECT id FROM employee WHERE username = ? AND pw = ?");
+    pstmt->setString(1, user);
+    pstmt->setString(2, pw);
     res = pstmt->executeQuery();
-    //If query result exists, return true - user and password combination are valid
-    if(res->next())
-    {
-        delete pstmt;
-        delete res;
-        delete con;
-        return true;
-    }
+
+    //If query result exists, isValid is true
+    bool isValid = res->next();
+
     //Else return false
     delete pstmt;
     delete res;
     delete con;
-    return false;
+    return isValid;
 }
 
-void create_user(int ssn,std::string name, std::string user, std::string pw, std::string lname, std::string fname)
+void create_user(std::string ssn,std::string name, std::string user, std::string pw, std::string lname, std::string fname)
 {
         //Create SQL Connection
         sql::Driver *driver;
@@ -171,9 +160,9 @@ void create_user(int ssn,std::string name, std::string user, std::string pw, std
         int id = res->getInt(1);
 
         //Create new employee tuple with user inputted values
-        pstmt = con->prepareStatement("INSERT INTO employee VALUES (?,?,?,?,?,?,NULL,NULL,NULL)");
+        pstmt = con->prepareStatement("INSERT INTO employee VALUES (?,?,?,?,?,?)");
         pstmt -> setInt(1,id);
-        pstmt -> setInt(2,ssn);
+        pstmt -> setString(2,ssn);
         pstmt -> setString(3,lname);
         pstmt -> setString(4,fname);
         pstmt -> setString(5,user);
@@ -201,43 +190,51 @@ void get_user(User *user)
     pstmt = con->prepareStatement("SELECT ID FROM EMPLOYEE WHERE Username = ?");
     pstmt -> setString(1,user->username);
     res = pstmt -> executeQuery();
+    res -> next();
     user->id = res->getInt(1);
 
     //Retrieve user's ssn
     pstmt = con->prepareStatement("SELECT SSN FROM EMPLOYEE WHERE Username = ?");
     pstmt -> setString(1,user->username);
     res = pstmt -> executeQuery();
-    user->ssn = res->getInt(1);
-
-    //Retrieve user's super_ssn
-    pstmt = con->prepareStatement("SELECT super_ssn FROM EMPLOYEE WHERE Username = ?");
-    pstmt -> setString(1,user->username);
-    res = pstmt -> executeQuery();
-    user->super_ssn = res->getInt(1);
-
-    //Retrieve user's department number
-    pstmt = con->prepareStatement("SELECT Dno FROM EMPLOYEE WHERE Username = ?");
-    pstmt -> setString(1,user->username);
-    res = pstmt -> executeQuery();
-    user->dno = res->getInt(1);
+    res -> next();
+    user->ssn = res->getString(1);
 
     //Retrieve user's last name
     pstmt = con->prepareStatement("SELECT Lname FROM EMPLOYEE WHERE Username = ?");
     pstmt -> setString(1,user->username);
     res = pstmt -> executeQuery();
+    res -> next();
     user->lname = res->getString(1);
 
     //Retrieve user's first name
     pstmt = con->prepareStatement("SELECT Fname FROM EMPLOYEE WHERE Username = ?");
     pstmt -> setString(1,user->username);
     res = pstmt -> executeQuery();
+    res -> next();
     user->fname = res->getString(1);
-
-    //Retrieve user's job title
-    pstmt = con->prepareStatement("SELECT job_title FROM EMPLOYEE WHERE Username = ?");
+/*  
+    uncomment after adding tuples
+   //Retrieve user's super_ssn
+    pstmt = con->prepareStatement("SELECT super_ssn FROM EMPLOYEE_INFO WHERE Username = ?");
     pstmt -> setString(1,user->username);
     res = pstmt -> executeQuery();
-    user->job_title = res->getString(1);
+    res -> next();
+    user->super_ssn = res->getInt(1);
+
+    //Retrieve user's department number
+    pstmt = con->prepareStatement("SELECT Dno FROM EMPLOYEE_INFO WHERE Username = ?");
+    pstmt -> setString(1,user->username);
+    res = pstmt -> executeQuery();
+    res -> next();
+    user->dno = res->getInt(1);
+
+    //Retrieve user's job title
+    pstmt = con->prepareStatement("SELECT job_title FROM EMPLOYEE_INFO WHERE Username = ?");
+    pstmt -> setString(1,user->username);
+    res = pstmt -> executeQuery();
+    res -> next();
+    user->job_title = res->getString(1);*/
 
     delete pstmt;
     delete con;
@@ -520,5 +517,11 @@ void move_to_OQC(int pn)
     res = pstmt -> executeQuery(); 
 
 
+
+}
+
+//Sample state insertion
+void state_init()
+{
 
 }
