@@ -27,15 +27,14 @@
     */
 
 
-
 void initialize();                  //initialize db
 void main_menu();                   //interactive menu to navigate options
 void login();                       //login to account that is saved in database
 void create_account();              //create account for user and save to database if successful
 bool valid_ssn(std::string ssn);
+
 //Supervisor
 void view_inventory(int dnum);      //allows supervisor to view materials and materials for their department
-void view_inspections(int dnum);    //view inspections for department
 void view_subordinate(int ssn);    //view subordinates under this employee
 
 void loginas_IQC_inspector();
@@ -59,5 +58,6 @@ etc.
 
 */
 
+void user_test();
 
 #endif

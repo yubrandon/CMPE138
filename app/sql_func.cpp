@@ -1,22 +1,45 @@
 /* SJSU CMPE 138 FALL 2023 TEAM 5 */
 #include "sql_func.h"
 
-void init()
+void db_init()
 {
     //Create MySQL connection
     sql::Driver *driver;
     sql::Connection *con;
     driver = get_driver_instance();
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con -> setSchema("InventoryDB");
 
     //Load SQL script
     std::ifstream sqlFile("../init.sql");
     std::string sqlScript((std::istreambuf_iterator<char>(sqlFile)),std::istreambuf_iterator<char>());
 
-    //Create statement and execute script
-    sql::Statement *stmt = con->createStatement();
-    stmt->execute(sqlScript);
+    std::vector<std::string> queries;
+    std::istringstream iss(sqlScript);
+    std::string query;
 
+    while (std::getline(iss, query, ';'))
+    {
+        // Trim leading and trailing whitespaces
+        query = std::regex_replace(query, std::regex("^\\s+|\\s+$"), "");
+
+        // Skip empty lines and comments
+        if (!query.empty() && query.find("--") != 0)
+        {
+            queries.push_back(query);
+        }
+    }
+
+    sql::Statement *stmt = con->createStatement();
+
+    for (const auto &singleQuery : queries)
+    {
+        // Check if the query is empty before executing
+        if (!singleQuery.empty())
+        {
+            stmt->execute(singleQuery);
+        }
+    }
     //Free storage
     delete stmt;
     delete con;
@@ -24,8 +47,6 @@ void init()
 
 bool user_exists(std::string user)
 {
-    /*try
-    {*/
         //Create SQL Connection
         sql::Driver *driver;
         sql::Connection *con;
@@ -55,21 +76,10 @@ bool user_exists(std::string user)
         delete con;
 
         return false;
-
-    /*} catch (sql::SQLException &e) {
-    std::cout << "# ERR: SQLException in " << __FILE__;
-    std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-    std::cout << "# ERR: " << e.what();
-    std::cout << " (MySQL error code: " << e.getErrorCode();
-    std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
-    }*/
-
 }
 
 bool ssn_exists(int ssn)
 {
-    /*try
-    {*/
         //Create SQL Connection
         sql::Driver *driver;
         sql::Connection *con;
@@ -141,10 +151,8 @@ bool verify_user(std::string user, std::string pw)
     return false;
 }
 
-void create_user(int ssn,std::string name, std::string user, std::string pw)
+void create_user(int ssn,std::string name, std::string user, std::string pw, std::string lname, std::string fname)
 {
-    /*try
-    {*/
         //Create SQL Connection
         sql::Driver *driver;
         sql::Connection *con;
@@ -163,26 +171,135 @@ void create_user(int ssn,std::string name, std::string user, std::string pw)
         int id = res->getInt(1);
 
         //Create new employee tuple with user inputted values
-        pstmt = con->prepareStatement("INSERT INTO employee VALUES (?,?,?,?,?)");
-        pstmt -> setInt(1,ssn);
-        pstmt -> setInt(2,id);
-        pstmt -> setString(3,name);
-        pstmt -> setString(4,user);
-        pstmt -> setString(5,pw);
+        pstmt = con->prepareStatement("INSERT INTO employee VALUES (?,?,?,?,?,?,NULL,NULL,NULL)");
+        pstmt -> setInt(1,id);
+        pstmt -> setInt(2,ssn);
+        pstmt -> setString(3,lname);
+        pstmt -> setString(4,fname);
+        pstmt -> setString(5,user);
+        pstmt -> setString(6,pw);
 
         pstmt -> execute();
 
         delete pstmt;
         delete con;
+}
 
+void get_user(User *user)
+//Retrieving logged in user's information
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
 
-    /*} catch (sql::SQLException &e) {
-    std::cout << "# ERR: SQLException in " << __FILE__;
-    std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-    std::cout << "# ERR: " << e.what();
-    std::cout << " (MySQL error code: " << e.getErrorCode();
-    std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
-    }*/
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //Retrieve user's id
+    pstmt = con->prepareStatement("SELECT ID FROM EMPLOYEE WHERE Username = ?");
+    pstmt -> setString(1,user->username);
+    res = pstmt -> executeQuery();
+    user->id = res->getInt(1);
+
+    //Retrieve user's ssn
+    pstmt = con->prepareStatement("SELECT SSN FROM EMPLOYEE WHERE Username = ?");
+    pstmt -> setString(1,user->username);
+    res = pstmt -> executeQuery();
+    user->ssn = res->getInt(1);
+
+    //Retrieve user's super_ssn
+    pstmt = con->prepareStatement("SELECT super_ssn FROM EMPLOYEE WHERE Username = ?");
+    pstmt -> setString(1,user->username);
+    res = pstmt -> executeQuery();
+    user->super_ssn = res->getInt(1);
+
+    //Retrieve user's department number
+    pstmt = con->prepareStatement("SELECT Dno FROM EMPLOYEE WHERE Username = ?");
+    pstmt -> setString(1,user->username);
+    res = pstmt -> executeQuery();
+    user->dno = res->getInt(1);
+
+    //Retrieve user's last name
+    pstmt = con->prepareStatement("SELECT Lname FROM EMPLOYEE WHERE Username = ?");
+    pstmt -> setString(1,user->username);
+    res = pstmt -> executeQuery();
+    user->lname = res->getString(1);
+
+    //Retrieve user's first name
+    pstmt = con->prepareStatement("SELECT Fname FROM EMPLOYEE WHERE Username = ?");
+    pstmt -> setString(1,user->username);
+    res = pstmt -> executeQuery();
+    user->fname = res->getString(1);
+
+    //Retrieve user's job title
+    pstmt = con->prepareStatement("SELECT job_title FROM EMPLOYEE WHERE Username = ?");
+    pstmt -> setString(1,user->username);
+    res = pstmt -> executeQuery();
+    user->job_title = res->getString(1);
+
+    delete pstmt;
+    delete con;
+    delete res;
+}
+
+std::vector<int> get_bom_id(int prnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    std::vector<int> mat_id;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT PMat_num FROM PART_LIST WHERE PPr_num = ?");
+    pstmt -> setInt(1,prnum);
+    res = pstmt -> executeQuery();
+
+    while(res->next())
+    {
+        mat_id.push_back(res->getInt(1));
+    }
+
+    delete con;
+    delete pstmt;
+    delete res;
+
+    return mat_id;
+}
+
+std::vector<std::string> get_bom_desc(std::vector<int> &id_vec)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    std::vector<std::string> mat_desc;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT Mat_desc FROM MATERIAL WHERE Mat_num = ?");
+    for(int i = 0; i < id_vec.size(); i++)
+    {
+        pstmt -> setInt(1,id_vec[i]);
+        res = pstmt -> executeQuery();
+        mat_desc.push_back(res -> getString(1));
+    }
+
+    delete con;
+    delete res;
+    delete pstmt;
+
+    return mat_desc;
+
 }
 
 /* --------------------------------------------------------------------------------------- */
@@ -317,7 +434,7 @@ bool approve_inspection(int insp_num, std::string insp_area)
 
     
     //prepare SQL statement to update pass/fail to true
-    pstmt = con->prepareStatement("UPDATE inspections SET pf = TRUE WHERE insp_num = ?");
+    pstmt = con->prepareStatement("UPDATE inspections SET pass_fail = TRUE WHERE insp_num = ?");
     pstmt->setInt(1, insp_num);
     pstmt->execute();
 
@@ -347,7 +464,7 @@ void view_inspection(int insp_num, std::string emp_role)
     pstmt = con->prepareStatement("SELECT * FROM inspections WHERE insp_num = (SELECT insp_num FROM inspection_area WHERE insp_area = '?')");
 
     //set INSP area based on employee role
-    if (emp_role == "IQC insepctor")
+    if (emp_role == "IQC Inspector")
         {   pstmt->setString(1, "IQC"); }
 
     else if (emp_role == "technician")
@@ -355,6 +472,7 @@ void view_inspection(int insp_num, std::string emp_role)
     
     else if (emp_role == "OQC inspector")
         {   pstmt->setString(1, "OQC"); }
+    
     
     pstmt->execute();
     
@@ -383,3 +501,24 @@ void view_inspection(int insp_num, std::string emp_role)
 // {
     
 // }
+
+
+void move_to_OQC(int pn)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::Statement *stmt;
+    sql::PreparedStatement *pstmt;
+    
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con -> prepareStatement("SELECT Insp_num FROM INSPECTIONS WHERE Insp_pnum = ?");
+    pstmt -> setInt(1,pn);
+    res = pstmt -> executeQuery(); 
+
+
+
+}

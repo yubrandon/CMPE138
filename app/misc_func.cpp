@@ -1,12 +1,24 @@
 /* SJSU CMPE 138 FALL 2023 TEAM 5 */
 #include "misc_func.h"
+#include "sql_func.h"
+
+//Global variables
+User *currUser;
 int LOGIN_COUNT = 0;
 int CREATE_COUNT = 0;
 
+void user_test()
+{
+    std::cout << currUser -> id << std::endl;
+    std::cout << currUser -> username << std::endl;
+    std::cout << currUser -> ssn << std::endl;
+
+}
+
 void initialize()
 {
-    //Initialize the database; defined in sql_func
-    init();
+    //Initialize the database
+    db_init();
 }
 
 void main_menu()
@@ -86,6 +98,10 @@ void login()
             return;
         }
     }
+    //Save credentials of current user
+    currUser -> username = user;
+    get_user(currUser);
+
     //Log successful login
     file_logger->info("complete\n");
     std::cout << "Successful login!" << std::endl;
@@ -96,6 +112,7 @@ void login()
      
     
     */
+   user_test();
 
 }
 void create_account()
@@ -113,7 +130,7 @@ void create_account()
     auto file_logger = spdlog::basic_logger_mt("create_account_" + std::to_string(CREATE_COUNT),"../logfile.txt");
     file_logger->info("start");
     int ssn;
-    std::string ssn_str,name,user,pw;
+    std::string ssn_str,name,user,pw,lname,fname;
     char temp;
 
     std::cout << "Enter your SSN: ";
@@ -203,7 +220,13 @@ void create_account()
     //Hash the password before passing to user creation method
     std::string hashed_pw = sha256(pw);
 
-    create_user(ssn, name, user,hashed_pw);
+    std::cout << "Enter your first name: ";
+    std::cin >> fname;
+
+    std::cout << "Enter your last name: ";
+    std::cin >> lname;
+
+    create_user(ssn, name, user,hashed_pw,lname,fname);
 
     //Log successful creation
     file_logger->info("complete\n");
@@ -216,6 +239,7 @@ bool valid_ssn(std::string str)
 {
     return str.length() == 9;
 }
+
 
 /* ----------------------------------------------------------------------------------------- */
 
