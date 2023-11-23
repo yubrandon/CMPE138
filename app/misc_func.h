@@ -33,9 +33,6 @@ void login();                       //login to account that is saved in database
 void create_account();              //create account for user and save to database if successful
 bool valid_ssn(std::string ssn);    //checks if ssn entered is valid
 
-//Supervisor
-void view_inventory(int dnum);      //allows supervisor to view materials and materials for their department
-void view_subordinate(int ssn);    //view subordinates under this employee
 
 void loginas_IQC_inspector();
 void loginas_OQC_inspector();
@@ -48,15 +45,8 @@ void display_OQCinsp_menu();
 void display_tech_menu();
 void display_QAdir_menu();
 void display_invassoc_menu();
+    
 
-/*
-functions to show menu for each entity type
-_view()
-_view()
-etc.
-
-
-*/
 
 void user_test();
 

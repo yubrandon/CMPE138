@@ -241,6 +241,102 @@ void get_user(User *user)
     delete res;
 }
 
+
+/* -------------------------ADMINISTRATOR------------------------------- */
+
+void assign_dept(int id,int dnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE EMPLOYEE_INFO SET Dno = ? WHERE ID = ?");
+    pstmt -> setInt(1,dnum);
+    pstmt -> setInt(2,id);
+    pstmt -> executeUpdate();
+
+    delete con;
+    delete pstmt;
+}
+void assign_role(int id, std::string role)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE EMPLOYEE_INFO SET job_title = ? WHERE ID = ?");
+    pstmt -> setString(1,role);
+    pstmt -> setInt(2,id);
+    pstmt -> executeUpdate();
+
+    delete con;
+    delete pstmt;
+}
+void assign_dept_mgr(std::string ssn, int dnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE DEPARTMENT SET Dept_mgr = ? WHERE Dnumber = ?");
+    pstmt -> setString(1,ssn);
+    pstmt -> setInt(2,dnum);
+    pstmt -> executeUpdate();
+
+    delete con;
+    delete pstmt;
+}
+
+/* -------------------------------------------------------------- */
+
+/* ---------------------------SUPERVISOR--------------------------- */
+std::vector<int> get_supervisee(std::string ssn)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    std::vector<int> supervisee;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con ->prepareStatement("SELECT ID FROM EMPLOYEE_INFO WHERE Super_ssn = ?");
+    pstmt -> setString(1,ssn);
+    res = pstmt -> executeQuery();
+
+    while(res ->next())
+    {
+        supervisee.push_back(res->getInt(1));
+    }
+
+    delete con;
+    delete pstmt;
+    delete res;
+
+    return supervisee;
+}
+
+std::vector<int> get_inventory(int dnum)
+{
+
+}
+
+/* -------------------------------------------------------------- */
 std::vector<int> get_bom_id(int prnum)
 {
     sql::Driver *driver;
@@ -505,23 +601,86 @@ void move_to_OQC(int pn)
     sql::Driver *driver;
     sql::Connection *con;
     sql::ResultSet *res;
-    sql::Statement *stmt;
     sql::PreparedStatement *pstmt;
     
     driver = get_driver_instance();
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con -> prepareStatement("SELECT Insp_num FROM INSPECTIONS WHERE Insp_pnum = ?");
-    pstmt -> setInt(1,pn);
+    pstmt = con -> prepareStatement("SELECT Qty FROM INSP_AREA WHERE Insp_pnum = ? AND Insp_area = 'IPQC'");
+    pstmt -> setInt(1,get_insp_num(pn));
     res = pstmt -> executeQuery(); 
+    res -> next();
+    int qty = res->getInt(1);
+
+    pstmt = con->prepareStatement("UPDATE PRODUCT_LOCATIONS SET stores = stores - ? AND ship = ship + ? WHERE Pr_num = ?");
+    pstmt->setInt(1,qty);
+    pstmt->setInt(2,qty);
+    pstmt->setInt(3,pn);
+    pstmt ->executeUpdate();
+
+    delete con;
+    delete res;
+    delete pstmt;
+
+}
 
 
+int get_insp_num(int pnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
 
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT Insp_num FROM INSPECTIONS WHERE Insp_pnum = ?");
+    pstmt -> setInt(1,pnum);
+    res = pstmt->executeQuery();
+
+    //returns 0 if no inspection is found for the given part number
+    int i = 0;
+    if(res->next())
+        i = res->getInt(1);
+    delete res;
+    delete pstmt;
+    delete con;
+    return i;
 }
 
 //Sample state insertion
 void state_init()
 {
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::Statement *stmt;
+    sql::PreparedStatement *pstmt;
 
+    SHA256 sha256;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //create administrator
+    pstmt = con -> prepareStatement("INSERT INTO EMPLOYEE VALUES(1, '999999999',admin,admin,admin,?)");
+    pstmt -> setString(1,sha256("admin"));
+    pstmt -> executeQuery();
+
+    //create departments
+
+    /*
+    questions
+    insp_req -> insp vs insp standalone
+
+    flowchart + new schema
+    
+    */
+
+   delete con;
+   delete stmt;
+   delete pstmt;
 }
