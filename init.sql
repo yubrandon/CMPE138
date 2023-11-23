@@ -16,7 +16,10 @@ CREATE TABLE EMPLOYEE(
     Lname varchar(30),
     Fname varchar(30),
     Username varchar(15),
-    Pw varchar(256),
+    Pw varchar(512)
+);
+
+CREATE TABLE EMPLOYEE_INFO(
     Super_ssn int,
     Dno int,
     Job_role varchar(10)
@@ -94,6 +97,4 @@ CREATE TABLE INSP_REQ_RES(
     Insp_res varchar(50)
 );
 
--- Sample state insertion
--- INSERT INTO EMPLOYEE VALUES();
 
