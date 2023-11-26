@@ -21,15 +21,31 @@ bool verify_user(std::string user, std::string pw);         //return boolean ind
 void create_user(int ssn, std::string name, std::string user, std::string pw);  //add tuple to db using user inputs
 
 
-void view_IQC_list();
-void create_inspection();
-void add_inspection(int pn, int insp_area, std::string requirements, std::string emp_role, int qty, std::string result, std::string insp_date);
-bool approve_inspection(int insp_num, std::string insp_area);
-void view_inspection(int insp_num);
-void move_to_IPQC(int pn);
+//SQL Queries to view various inspection lists
+void view_inspections(std::string dept_name);
+void view_inspections(std::string dept_name, std::string title);
+void view_inspection_requirements(int insp_num);
 
-void receive_material(int pn);
-void backflush_product(int pn);
-void move_to_IQC(int pn);
+//SQL Queries for Adding New Inspections
+int get_next_insp_num();
+int get_account();
+int get_sample_size(int insp_num);
+void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area);
+
+//SQL Quesries for Approving Inspections
+int get_qty_inspected(int insp_num);
+int calculate_fpy(int insp_num);
+void set_insp_pf(std::string);
+
+//SQL Queries for Adding Material
+int get_next_mat_num();
+void add_to_materials(int mat_num, std::string mat_desc, std::string supp_name, int supp_num);
+
+//SQL Queries for Adding Product
+int get_next_prod_num();
+
+//SQL Queries for Creating Inspection Requirements
+bool part_exists(int mat_prod_num);
+void create_requirements(int mat_prod_num, std::string requirement, std::string res_type);
 
 #endif

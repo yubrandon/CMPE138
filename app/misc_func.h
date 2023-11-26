@@ -36,15 +36,30 @@ bool valid_ssn(std::string ssn);
 
 void loginas_IQC_inspector();
 void loginas_OQC_inspector();
-//void loginas_technician();
 void loginas_QAdirector();
 void loginas_inv_associate();
+void loginas_technician();
 
 void display_IQCinsp_menu();
 void display_OQCinsp_menu();
-void display_tech_menu();
 void display_QAdir_menu();
 void display_invassoc_menu();
+void display_tech_menu();
+
+void view_all_inventory();
+void view_IQC_inspections();
+void view_OQC_inspections();
+void add_new_inspections(std::string dept_name, std::string title);
+void approve_inspection(std::string dept_name, std::string title);
+void send_email(int insp_num);
+void send_email(std::string dept_name, std::string title);
+void add_material();
+void add_product();
+void create_inspection_requirements();
+void view_final_product_inspections();
+void receive_material();
+void pull_wo();
+void backflush_product();
 
 /*
 functions to show menu for each entity type
