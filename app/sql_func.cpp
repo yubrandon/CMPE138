@@ -208,6 +208,7 @@ void create_user(int ssn,std::string name, std::string user, std::string pw)
 //     delete con;
 // }
 
+
 /* -----------------------Add inspection based on employee role-----------------------------*/
 void add_inspection(int pn, int insp_area, std::string requirements, std::string emp_role,
                                 int qty, std::string result, std::string insp_date)
