@@ -575,25 +575,15 @@ void view_inspection(int insp_num, std::string emp_role)
     delete pstmt;
     delete con;   
 }
-// void header::move_to_IPQC(int pn)
-// {
-//      no longer needed, implemented in approve_inspection
-// }
 
-// void header::receive_material(int pn)
-// {
-    
-// }
+/* -----------------------------SQL QUERIES------------------------------ */
 
-// void header::backflush_product(int pn)
-// {
-    
-// }
+//SQL Queries to view various inspection lists
 
-// void header::move_to_IQC(int pn)
-// {
+void view_inspections(std::string dept_name)
+{
     
-// }
+}
 
 
 void move_to_OQC(int pn)
@@ -650,6 +640,85 @@ int get_insp_num(int pnum)
     delete con;
     return i;
 }
+
+
+void view_inspections(std::string dept_name, std::string title)
+{
+    
+}
+
+void view_inspection_requirements(int insp_num)
+{
+    
+}
+
+//SQL Queries for Adding New Inspections
+int get_next_insp_num()
+{
+    return 0;
+}
+
+int get_account()
+{
+    return 0;
+}
+
+int get_sample_size(int insp_num)
+{
+    return 0;
+}
+
+void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area)
+{
+    
+}
+
+//SQL Quesries for Approving Inspections
+int get_qty_inspected(int insp_num)
+{
+    return 0;
+}
+
+int calculate_fpy(int insp_num)
+{
+    return 0;
+}
+
+void set_insp_pf(std::string)
+{
+    
+}
+
+//SQL Queries for Adding Material
+int get_next_mat_num()
+{
+    return 0;
+}
+
+void add_to_materials(int mat_num, std::string mat_desc, std::string supp_name, int supp_num)
+{
+    
+}
+
+//SQL Queries for Adding Product
+int get_next_prod_num()
+{
+    return 0;
+}
+
+//SQL Queries for Creating Inspection Requirements
+bool part_exists(int mat_prod_num)
+{
+    return false;
+}
+
+void create_requirements(int mat_prod_num, std::string requirement, std::string res_type)
+{
+    
+}
+
+
+
 
 //Sample state insertion
 void state_init()
