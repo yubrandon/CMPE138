@@ -665,22 +665,12 @@ void state_init()
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    //create administrator
-    pstmt = con -> prepareStatement("INSERT INTO EMPLOYEE VALUES(1, '999999999',admin,admin,admin,?)");
-    pstmt -> setString(1,sha256("admin"));
-    pstmt -> executeQuery();
 
     //create departments
 
-    /*
-    questions
-    insp_req -> insp vs insp standalone
-
-    flowchart + new schema
     
-    */
 
-   delete con;
-   delete stmt;
-   delete pstmt;
+    delete con;
+    delete stmt;
+    delete pstmt;
 }

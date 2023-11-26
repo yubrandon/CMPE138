@@ -20,7 +20,7 @@ CREATE TABLE EMPLOYEE(
 );
 
 CREATE TABLE EMPLOYEE_INFO(
-    Super_ssn int,
+    ID int,
     Dno int,
     Job_role varchar(10)
 );
@@ -38,26 +38,31 @@ CREATE TABLE MATERIAL(
     Supp_name varchar(30)
 );
 
-CREATE TABLE STORAGE_LOCATION(
+CREATE TABLE MAT_LOCATION(
     Mat_num int,
-    RECEIVED int,
     INSP int,
     STORES int,
     WIP int,
-    FGI int
 );
 
 CREATE TABLE PRODUCT(
     Pr_num int,
     Pr_desc varchar(50),
+);
+
+CREATE TABLE PRODUCT_LOCATIONS(
+    Pr_num int,
     STORES int,
-    SHIP int,
+    WIP int,
+    QC int,
     FGI int
+
 );
 
 CREATE TABLE PART_LIST(
     PMat_num int,
-    PPr_num int
+    PPr_num int,
+    Mat_qty
 );
 
 CREATE TABLE INSPECTION_REQ(
