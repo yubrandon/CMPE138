@@ -1,30 +1,25 @@
 /* SJSU CMPE 138 FALL 2023 TEAM 5 */
 #include "misc_func.h"
+#include "sql_func.h"
+
+//Global variables
+User *currUser = new User;
 int LOGIN_COUNT = 0;
 int CREATE_COUNT = 0;
+
+void user_test()
+{
+    std::cout << currUser -> id << std::endl;
+    std::cout << currUser -> username << std::endl;
+    std::cout << currUser -> ssn << std::endl;
+
+}
 
 void initialize()
 {
     //Initialize the database
-
-    //Create MySQL connection
-    sql::Driver *driver;
-    sql::Connection *con;
-    driver = get_driver_instance();
-    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
-
-    //Load SQL script
-    std::ifstream script("../init.sql");
-    std::string sql((std::istreambuf_iterator<char>(script)),std::istreambuf_iterator<char>());
-
-    //Create statement and execute script
-    sql::Statement *stmt = con->createStatement();
-    stmt->execute(sql);
-
-    //Free storage
-    delete stmt;
-    delete con;
-
+    db_init();
+    state_init();
 }
 
 void main_menu()
@@ -46,6 +41,7 @@ void main_menu()
                 break;
             case 3:
                 std::cout << "Exited." << std::endl;
+                delete currUser;
                 exit(0);
                 break;
             default:std::cout << "Error: Please select a valid option." << std::endl;
@@ -104,8 +100,12 @@ void login()
             return;
         }
     }
+    //Save credentials of current user
+    currUser -> username = user;
+    get_user(currUser);
+
     //Log successful login
-    file_logger->info("complete");
+    file_logger->info("complete\n");
     std::cout << "Successful login!" << std::endl;
     /*
     call function that displays menus based on entity
@@ -114,6 +114,8 @@ void login()
      
     
     */
+   //prints out user id,username,ssn - testing
+   user_test();
 
 }
 void create_account()
@@ -130,8 +132,7 @@ void create_account()
     //Log start of account creation process
     auto file_logger = spdlog::basic_logger_mt("create_account_" + std::to_string(CREATE_COUNT),"../logfile.txt");
     file_logger->info("start");
-    int ssn;
-    std::string ssn_str,name,user,pw;
+    std::string ssn_str,name,user,pw,lname,fname;
     char temp;
 
     std::cout << "Enter your SSN: ";
@@ -152,11 +153,9 @@ void create_account()
             return;
         }
     }
-    // If ssn entered is valid, save an integer version
-    ssn = std::stoi(ssn_str);
 
     //Check if SSN is registered in system
-    while(ssn_exists(ssn))
+    while(ssn_exists(ssn_str))
     {
         //If SSN already exists, log event
         file_logger->info("duplicate ssn input");
@@ -187,14 +186,9 @@ void create_account()
                 return;
             }
         }
-        //If entered value was not 'exit', check for validity, and if valid, save new value as integer for comparison
-        ssn = std::stoi(ssn_str);
     }
 
-    //If SSN is valid and doesn't exist, prompt user for: name, username, password
-    std::cout << "Enter your name: ";
-    std::cin >> name;
-
+    //If SSN is valid and doesn't exist, prompt user for: username, password, name
     std::cout << "Enter your desired username: ";
     std::cin >> user;
 
@@ -221,10 +215,16 @@ void create_account()
     //Hash the password before passing to user creation method
     std::string hashed_pw = sha256(pw);
 
-    create_user(ssn, name, user,hashed_pw);
+    std::cout << "Enter your first name: ";
+    std::cin >> fname;
+
+    std::cout << "Enter your last name: ";
+    std::cin >> lname;
+
+    create_user(ssn_str, name, user,hashed_pw,lname,fname);
 
     //Log successful creation
-    file_logger->info("complete");
+    file_logger->info("complete\n");
     std::cout << "Account successfully created!" << std::endl;
 
     //Return to main menu after completion
@@ -236,6 +236,7 @@ bool valid_ssn(std::string str)
 }
 
 
+/* ----------------------------------------------------------------------------------------- */
 
 /* ------------------------------------------------------------------------
  * Logins for each type of employee
@@ -509,7 +510,7 @@ void display_invassoc_menu()
                 case 5: //logout
                     std::cout << "Goodbye!\n";      
                     goto exitwhileloop;
-            }
+            };
             
         }
         

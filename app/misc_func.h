@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "global_variables.h"
 #include "sql_func.h"
 #include "sha256.h"
@@ -26,12 +27,11 @@
     */
 
 
-
 void initialize();                  //initialize db
 void main_menu();                   //interactive menu to navigate options
 void login();                       //login to account that is saved in database
 void create_account();              //create account for user and save to database if successful
-bool valid_ssn(std::string ssn);
+bool valid_ssn(std::string ssn);    //checks if ssn entered is valid
 
 
 void loginas_IQC_inspector();
@@ -60,15 +60,5 @@ void view_final_product_inspections();
 void receive_material();
 void pull_wo();
 void backflush_product();
-
-/*
-functions to show menu for each entity type
-_view()
-_view()
-etc.
-
-
-*/
-
 
 #endif
