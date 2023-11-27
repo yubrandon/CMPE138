@@ -142,36 +142,36 @@ bool verify_user(std::string user, std::string pw)
 
 void create_user(std::string ssn,std::string name, std::string user, std::string pw, std::string lname, std::string fname)
 {
-        //Create SQL Connection
-        sql::Driver *driver;
-        sql::Connection *con;
-        sql::PreparedStatement *pstmt;
-        sql::Statement *stmt;
-        sql::ResultSet *res;
+    //Create SQL Connection
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::PreparedStatement *pstmt;
+    sql::Statement *stmt;
+    sql::ResultSet *res;
 
-        driver = get_driver_instance();
-        con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
-        con->setSchema("InventoryDB");
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
 
-        stmt = con -> createStatement();
-        //Save count of employees to assign ID for new employee
-        res = stmt ->executeQuery("SELECT COUNT(*)+1 FROM employee");
-        res->next();
-        int id = res->getInt(1);
+    stmt = con -> createStatement();
+    //Save count of employees to assign ID for new employee
+    res = stmt ->executeQuery("SELECT COUNT(*)+1 FROM employee");
+    res->next();
+    int id = res->getInt(1);
 
-        //Create new employee tuple with user inputted values
-        pstmt = con->prepareStatement("INSERT INTO employee VALUES (?,?,?,?,?,?)");
-        pstmt -> setInt(1,id);
-        pstmt -> setString(2,ssn);
-        pstmt -> setString(3,lname);
-        pstmt -> setString(4,fname);
-        pstmt -> setString(5,user);
-        pstmt -> setString(6,pw);
+    //Create new employee tuple with user inputted values
+    pstmt = con->prepareStatement("INSERT INTO employee VALUES (?,?,?,?,?,?)");
+    pstmt -> setInt(1,id);
+    pstmt -> setString(2,ssn);
+    pstmt -> setString(3,lname);
+    pstmt -> setString(4,fname);
+    pstmt -> setString(5,user);
+    pstmt -> setString(6,pw);
 
-        pstmt -> execute();
+    pstmt -> execute();
 
-        delete pstmt;
-        delete con;
+    delete pstmt;
+    delete con;
 }
 
 void get_user(User *user)
@@ -242,7 +242,7 @@ void get_user(User *user)
 }
 
 
-/* -------------------------ADMINISTRATOR------------------------------- */
+/* -------------------------SUPERVISOR/DEPARTMENT MGR------------------------------- */
 
 void assign_dept(int id,int dnum)
 {
@@ -280,6 +280,44 @@ void assign_role(int id, std::string role)
     delete con;
     delete pstmt;
 }
+
+void create_dept(int dnum,std::string d_desc)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("INSERT INTO DEPARTMENT VALUES(?,NULL,?)");
+    pstmt -> setInt(1,dnum);
+    pstmt -> setString(2,d_desc);
+    pstmt -> execute();
+
+    delete con;
+    delete pstmt;
+}
+void edit_dept(int dnum, std::string d_desc)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE DEPARTMENT SET Description = ? WHERE Dnumber = ?");
+    pstmt -> setString(1,d_desc);
+    pstmt -> setInt(2,dnum);
+    pstmt -> executeUpdate();
+
+    delete con;
+    delete pstmt;
+}
+
 void assign_dept_mgr(std::string ssn, int dnum)
 {
     sql::Driver *driver;
@@ -299,9 +337,6 @@ void assign_dept_mgr(std::string ssn, int dnum)
     delete pstmt;
 }
 
-/* -------------------------------------------------------------- */
-
-/* ---------------------------SUPERVISOR--------------------------- */
 std::vector<int> get_supervisee(std::string ssn)
 {
     sql::Driver *driver;
@@ -337,7 +372,7 @@ std::vector<int> get_inventory(int dnum)
 }
 
 /* -------------------------------------------------------------- */
-std::vector<int> get_bom_id(int prnum)
+std::vector<int> get_bom_id(int pnum)
 {
     sql::Driver *driver;
     sql::Connection *con;
@@ -351,7 +386,7 @@ std::vector<int> get_bom_id(int prnum)
     con->setSchema("InventoryDB");
 
     pstmt = con->prepareStatement("SELECT PMat_num FROM PART_LIST WHERE PPr_num = ?");
-    pstmt -> setInt(1,prnum);
+    pstmt -> setInt(1,pnum);
     res = pstmt -> executeQuery();
 
     while(res->next())
@@ -379,7 +414,7 @@ std::vector<std::string> get_bom_desc(std::vector<int> &id_vec)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("SELECT Mat_desc FROM MATERIAL WHERE Mat_num = ?");
+    pstmt = con->prepareStatement("SELECT P_desc FROM MATERIAL WHERE P_num = ?");
     for(int i = 0; i < id_vec.size(); i++)
     {
         pstmt -> setInt(1,id_vec[i]);
@@ -542,7 +577,7 @@ bool approve_inspection(int insp_num, std::string insp_area)
 /* -----------------------View inspections based on employee role-----------------------------*/
 void view_inspection(int insp_num, std::string emp_role)
 {
-         //Create SQL Connection
+    //Create SQL Connection
     sql::Driver *driver;
     sql::Connection *con;
     sql::ResultSet *res;
@@ -603,7 +638,7 @@ void move_to_OQC(int pn)
     res -> next();
     int qty = res->getInt(1);
 
-    pstmt = con->prepareStatement("UPDATE PRODUCT_LOCATIONS SET stores = stores - ? AND ship = ship + ? WHERE Pr_num = ?");
+    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET stores = stores - ? AND ship = ship + ? WHERE Pr_num = ?");
     pstmt->setInt(1,qty);
     pstmt->setInt(2,qty);
     pstmt->setInt(3,pn);
@@ -670,7 +705,23 @@ int get_sample_size(int insp_num)
 
 void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area)
 {
-    
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("INSERT INTO INSPECTIONS VALUES(?,?)");
+    pstmt->setInt(1,insp_num);
+    pstmt -> execute();
+
+
+    delete con;
+    delete res;
+    delete pstmt;
 }
 
 //SQL Quesries for Approving Inspections
@@ -690,15 +741,262 @@ void set_insp_pf(std::string)
 }
 
 //SQL Queries for Adding Material
-int get_next_mat_num()
+/*int get_next_mat_num()
 {
     return 0;
+}*/
+
+void add_part(std::string pdesc, int type)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::Statement *stmt;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    stmt = con->createStatement();
+    res = stmt->executeQuery("SELECT COUNT(*) FROM PART");
+    res->next();
+
+    int pnum = res->getInt(1);
+
+    pstmt = con->prepareStatement("INSERT INTO PART VALUES(?,?,?)");
+    pstmt->setInt(1,pnum);
+    pstmt->setString(2,pdesc);
+    pstmt->setInt(3,type);
+
+    pstmt->execute();
+
+    delete con;
+    delete res;
+    delete pstmt;
+    delete stmt;
 }
 
-void add_to_materials(int mat_num, std::string mat_desc, std::string supp_name, int supp_num)
+void edit_part_name(int pnum, std::string pdesc)
 {
-    
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE PART SET P_desc = ? WHERE P_num");
+    pstmt->setString(1,pdesc);
+    pstmt->setInt(2,pnum);
+
+    pstmt->executeUpdate();
+
+    delete con;
+    delete res;
+    delete pstmt;
 }
+
+bool part_exists(int pnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT P_num FROM PART WHERE P_num = ?");
+    pstmt->setInt(1,pnum);
+    res = pstmt->executeQuery();
+
+    bool exists = false;
+    if(res->next()) exists = true;
+
+    delete con;
+    delete res;
+    delete pstmt;
+    return exists;
+}
+
+int get_part_id(std::string pname)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT P_desc FROM MAT_LOCATIONS WHERE Pr_desc = ?");
+    pstmt->setString(1,pname);
+    res = pstmt->executeQuery();
+
+    int id = 0;
+    if(res->next()) id = res->getInt(1);
+
+    delete con;
+    delete res;
+    delete pstmt;
+
+    return id;
+}
+
+bool is_product(int pnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT Product FROM PART WHERE P_num = ?");
+    pstmt->setInt(1,pnum);
+    res = pstmt->executeQuery();
+    res->next();
+
+    bool product = false;
+    if(res->getInt(1) == 1) product = true;
+
+    delete con;
+    delete res;
+    delete pstmt;
+
+    return product;
+}
+
+
+void add_part_supplier(int pnum, int supp_num, std::string supp_name)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("INSERT INTO PART_SUPPLIER VALUES(?,?,?)");
+    pstmt->setInt(1,pnum);
+    pstmt->setInt(2,supp_num);
+    pstmt->setString(3,supp_name);
+
+    pstmt->execute();
+
+    delete con;
+    delete res;
+    delete pstmt;
+}
+
+void edit_part_supplier(int pnum, int supp_num, std::string supp_name)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE PART_SUPPLIER set Supp_num = ?, Supp_name = ? WHERE P_num = ?");
+    pstmt->setInt(1,supp_num);
+    pstmt->setString(2,supp_name);
+    pstmt->setInt(3,pnum);
+
+    pstmt->executeUpdate();
+
+    delete con;
+    delete res;
+    delete pstmt;
+}
+
+void add_part_location(int pnum, int INSP, int STORES, int WIP, int QC, int FGI)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("INSERT INTO MAT_LOCATIONS VALUES(?,?,?,?,?,?)");
+    pstmt->setInt(1,pnum);
+    pstmt->setInt(2,INSP);
+    pstmt->setInt(3,STORES);
+    pstmt->setInt(4,WIP);
+    pstmt->setInt(5,QC);
+    pstmt->setInt(6,FGI);
+
+    pstmt -> execute();
+
+    delete con;
+    delete res;
+    delete pstmt;
+}
+
+void edit_part_location(int pnum, int INSP, int STORES, int WIP, int QC, int FGI)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE PART_LOCATION set INSP = ?, STORES = ?, WIP = ?, QC = ?, FGI = ? WHERE P_num = ?");
+    pstmt->setInt(1,INSP);
+    pstmt->setInt(2,STORES);
+    pstmt->setInt(3,WIP);
+    pstmt->setInt(4,QC);
+    pstmt->setInt(5,FGI);
+    pstmt->setInt(6,pnum);
+
+    pstmt -> executeUpdate();
+
+    delete con;
+    delete res;
+    delete pstmt;
+}
+
+bool part_loc_exists(int pnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT P_num FROM PART_LOCATION WHERE P_num = ?");
+    pstmt->setInt(1,pnum);
+    res = pstmt->executeQuery();
+
+    bool exists = false;
+    if(res->next()) exists = true;
+
+    delete con;
+    delete res;
+    delete pstmt;
+    return exists;
+}
+
 
 //SQL Queries for Adding Product
 int get_next_prod_num()
@@ -706,22 +1004,63 @@ int get_next_prod_num()
     return 0;
 }
 
-//SQL Queries for Creating Inspection Requirements
-bool part_exists(int mat_prod_num)
+
+void add_kit(int pr_num,std::vector<int>&mat_list,std::vector<int>&qty)
 {
-    return false;
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    for(int i=0; i < mat_list.size(); i++)
+    {
+        pstmt = con->prepareStatement("INSERT INTO PART_LIST VALUES(?,?,?)");
+        pstmt->setInt(1,pr_num);
+        pstmt->setInt(2,mat_list[i]);
+        pstmt->setInt(3,qty[i]);
+        pstmt->execute();
+    }
+
+    delete con;
+    delete res;
+    delete pstmt;
 }
+
 
 void create_requirements(int mat_prod_num, std::string requirement, std::string res_type)
 {
-    
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    for(int i=0; i < mat_list.size(); i++)
+    {
+        pstmt = con->prepareStatement("INSERT INTO PART_LIST VALUES(?,?,?)");
+        pstmt->setInt(1,pr_num);
+        pstmt->setInt(2,mat_list[i]);
+        pstmt->setInt(3,qty[i]);
+        pstmt->execute();
+    }
+
+    delete con;
+    delete res;
+    delete pstmt;
 }
 
 
 
 
 //Sample state insertion
-void state_init()
+/*void state_init()
 {
     sql::Driver *driver;
     sql::Connection *con;
@@ -742,4 +1081,4 @@ void state_init()
     delete con;
     delete stmt;
     delete pstmt;
-}
+}*/

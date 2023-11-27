@@ -19,7 +19,7 @@ void initialize()
 {
     //Initialize the database
     db_init();
-    state_init();
+    //state_init();
 }
 
 void main_menu()
@@ -411,7 +411,7 @@ void display_QAdir_menu()
         std::cout << "Choose an option below:\n";
     
         std::cout << "\t1. View inventory\n";
-        std::cout << "\t2. Add material information to inventory\n";
+        std::cout << "\t2. Add part information to inventory\n";
         std::cout << "\t3. Add product information to inventory\n";
         std::cout << "\t4. Create inspection requirement\n";
         std::cout << "\t5. View Final Inspections\n";
@@ -434,7 +434,7 @@ void display_QAdir_menu()
                     break;
                     
                 case 2:
-                    add_material();
+                    add_part_menu();
                     break;
                     
                 case 3:
@@ -713,16 +713,14 @@ void send_email(int insp_num)
     
 }
 
-void add_material()
+void add_part_menu()
 {
-    int mat_num, supp_num;
-    std::string mat_desc, supp_name;
+    int supp_num;
+    std::string part_desc, supp_name,product;
     
-    //query to get next material number
-    mat_num = get_next_mat_num();
     
-    std::cout << "Enter the new material description: ";
-    std::cin >> mat_desc;
+    std::cout << "Enter the new part description: ";
+    std::cin >> part_desc;
     
     std::cout << "Enter the supplier name: ";
     std::cin >> supp_name;
@@ -730,51 +728,41 @@ void add_material()
     std::cout << "Enter the supplier's part number: ";
     std:: cin >> supp_num;
     
-    //query to add information to Materials table
-    std::cout << "Adding material to inventory list...";
-    add_to_materials(mat_num, mat_desc, supp_name, supp_num);
-    std::cout << "Material added!\n";
-}
+    std::cout << "Is this item a product? (y/n)";
+    std::cin >> product;
 
-void add_product()
-{
-    int prod_num, prod_desc, mat_num, mat_qty, choice;
-    std::string pn, qty;
-    std::string option;
-    bool add_more = true;
-    
-    //query to get next product number
-    prod_num = get_next_prod_num();
-    
-    std::cout << "Enter the new product description: ";
-    std::cin >> prod_desc;
-    
-    while (add_more)
+    for(char &c : product)
     {
-        
-        std::cout << "Enter the material number you would like to add to the product: ";
-        std::cin >> pn;
-        mat_num = std::stoi(pn);
-        
-        std::cout << "Enter the quantity for " << pn << ": ";
-        std::cin >> qty;
-        mat_qty = std::stoi(qty);
-        
-        
-        std::cout << "Would you like to add another item to this product?\n";
-        std::cout << "\t1. Yes\n";
-        std::cout << "\t2. No\n";
-        
-        std::cin >> option;
-        choice = std::stoi(option);
-        
-        if (choice == 2)
+        c = std::tolower(c);
+    }
+
+    while(product != "y" && product != "n")
+    {
+        std::cout << "Invalid entry, please try again, or enter 'exit' to return: ";
+        std::cin >> product;
+        for(char &c : product)
         {
-            add_more = false;
-            std::cout << "Product added to inventory!";
+            c = std::tolower(c);
+        }
+        if(product == "exit")
+        {
+            //Log exit event
+            //file_logger->info("exit at username input");
+            std::cout << "Returning to main menu." << std::endl;
+            return;
         }
     }
+    int product_int;
+    if(product == "y") product_int = 1;
+    else product_int = 0;
     
+    //query to add information to Materials table
+    std::cout << "Adding part to inventory list...";
+    add_part(part_desc,product_int);
+
+
+
+    std::cout << "Part added!\n";
 }
 
 void create_inspection_requirements()
@@ -857,17 +845,20 @@ void create_inspection_requirements()
     
 }
 
+//inventory associatae
 void receive_material()
 {
-    
+    //add material into stores
 }
 
 void pull_wo()
 {
-    
+    //view bom
+    //subtract mats from mat locations and add to wip
+    //ask how many products to build
 }
 
 void backflush_product()
 {
-    
+    //remove wip for a product and add to fgi
 }
