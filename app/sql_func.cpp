@@ -372,6 +372,7 @@ std::vector<int> get_inventory(int dnum)
 }
 
 /* -------------------------------------------------------------- */
+
 std::vector<int> get_bom_id(int pnum)
 {
     sql::Driver *driver;
@@ -428,6 +429,11 @@ std::vector<std::string> get_bom_desc(std::vector<int> &id_vec)
 
     return mat_desc;
 
+}
+
+void pull_wo(int prnum, std::vector<int> mat_ids, int qty)
+{
+    
 }
 
 /* --------------------------------------------------------------------------------------- */
@@ -619,7 +625,46 @@ void view_inspections(std::string dept_name)
 {
     
 }
+void receive_material(int pn, int qty)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+    
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
 
+    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET INSP = INSP + ? WHERE P_num = ?");
+    pstmt->setInt(1,qty);
+    pstmt->setInt(2,pn);
+    pstmt ->executeUpdate();
+
+    delete con;
+    delete res;
+    delete pstmt;
+}
+
+void receive_material_accessory(int pn, int qty)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::PreparedStatement *pstmt;
+    
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET stores = stores + ? WHERE P_num = ?");
+    pstmt->setInt(1,qty);
+    pstmt->setInt(2,pn);
+    pstmt ->executeUpdate();
+
+    delete con;
+    delete pstmt;
+}
+void backflush_product(int pn);
 
 void move_to_OQC(int pn)
 {
@@ -848,7 +893,7 @@ int get_part_id(std::string pname)
     return id;
 }
 
-bool is_product(int pnum)
+int get_part_type(int pnum)
 {
     sql::Driver *driver;
     sql::Connection *con;
@@ -859,20 +904,47 @@ bool is_product(int pnum)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("SELECT Product FROM PART WHERE P_num = ?");
+    pstmt = con->prepareStatement("SELECT P_type FROM PART WHERE P_num = ?");
     pstmt->setInt(1,pnum);
     res = pstmt->executeQuery();
     res->next();
 
-    bool product = false;
-    if(res->getInt(1) == 1) product = true;
+    int type = res->getInt(1);
 
     delete con;
     delete res;
     delete pstmt;
 
-    return product;
+    return type;
 }
+
+std::string get_part_name(int pnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT P_desc FROM PART WHERE P_num = ?");
+    pstmt->setInt(1,pnum);
+    res = pstmt->executeQuery();
+    res->next();
+
+    std::string name = res->getString(1);
+
+    delete con;
+    delete res;
+    delete pstmt;
+
+    return name;
+}
+
+
+
 
 
 void add_part_supplier(int pnum, int supp_num, std::string supp_name)
@@ -997,6 +1069,28 @@ bool part_loc_exists(int pnum)
     return exists;
 }
 
+int get_stores_count(int pnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT STORES FROM PART_LOCATION WHERE P_num = ?");
+    pstmt->setInt(1,pnum);
+    res = pstmt->executeQuery();
+
+    int count = res->getInt(1);
+
+    delete con;
+    delete res;
+    delete pstmt;
+    return count;
+}
 
 //SQL Queries for Adding Product
 int get_next_prod_num()
@@ -1030,6 +1124,30 @@ void add_kit(int pr_num,std::vector<int>&mat_list,std::vector<int>&qty)
     delete pstmt;
 }
 
+int get_mat_quantity(int pr_num,int mat_num)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT Mat_Qty FROM PART_LIST WHERE Pmat_num = ? AND PPr_num = ?");
+    pstmt -> setInt(1,mat_num);
+    pstmt->setInt(2,pr_num);
+    res = pstmt->executeQuery();
+    res->next();
+
+    int qty = res->getInt(1);
+
+    delete con;
+    delete res;
+    delete pstmt;
+    return qty;
+}
 
 void create_requirements(int mat_prod_num, std::string requirement, std::string res_type)
 {
@@ -1042,14 +1160,7 @@ void create_requirements(int mat_prod_num, std::string requirement, std::string 
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    for(int i=0; i < mat_list.size(); i++)
-    {
-        pstmt = con->prepareStatement("INSERT INTO PART_LIST VALUES(?,?,?)");
-        pstmt->setInt(1,pr_num);
-        pstmt->setInt(2,mat_list[i]);
-        pstmt->setInt(3,qty[i]);
-        pstmt->execute();
-    }
+    
 
     delete con;
     delete res;

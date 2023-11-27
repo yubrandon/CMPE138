@@ -56,8 +56,10 @@ void send_email(std::string dept_name, std::string title);
 void add_part_menu();
 void create_inspection_requirements();
 void view_final_product_inspections();
-void receive_material();
-void pull_wo();
+void receive_part_menu();
+void pull_wo_menu();
 void backflush_product();
+
+std::string tolowerstring(std::string str);
 
 #endif

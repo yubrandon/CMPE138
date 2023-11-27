@@ -69,7 +69,8 @@ void login()
         //Offer option to retry or return to main menu
         std::cout << "User does not exist, please enter a valid username, or 'exit' to return: ";
         std::cin >> user;
-        if(user == "Exit" || user == "exit")
+        std::string exitcheck = tolowerstring(user);
+        if(exitcheck == "exit")
         {
             //Log exit event
             file_logger->info("exit at username input");
@@ -92,7 +93,8 @@ void login()
         //Offer option to retry or return to main menu
         std::cout << "Invalid password, try again or type 'exit' to return to the main menu: ";
         std::cin >> pw;
-        if(user == "Exit" || user == "exit")
+        std::string exitcheck = tolowerstring(pw);
+        if(exitcheck == "exit")
         {
             //Log exit event
             file_logger->info("exit at password input");
@@ -144,8 +146,9 @@ void create_account()
         file_logger->info("invalid ssn input");
         std::cout << "Invalid SSN, input a new value, or type 'exit' to return to the main menu: ";
         std::cin >> ssn_str;
-        //Offer option to retry or return to main menu
-        if(user == "Exit" || user == "exit")
+        
+        std::string exitcheck = tolowerstring(ssn_str);
+        if(exitcheck == "exit")
         {
             //Log exit event
             file_logger->info("exit at invalid ssn");
@@ -163,7 +166,8 @@ void create_account()
         std::cin >> ssn_str;
 
         //Offer option to retry to return to main menu
-        if(ssn_str == "Exit" || ssn_str == "exit")
+        std::string exitcheck = tolowerstring(ssn_str);
+        if(exitcheck == "exit")
         {
             file_logger->info("exit at duplicate ssn input");
             std::cout << "Returning to main menu." << std::endl;
@@ -178,7 +182,8 @@ void create_account()
             std::cin >> ssn_str;
 
             //Offer option to retry or return to main menu
-            if(ssn_str == "Exit" || ssn_str == "exit")
+            exitcheck = tolowerstring(ssn_str);
+            if(exitcheck == "exit")
             {
                 //Log exit event
                 file_logger->info("exit at invalid ssn");
@@ -201,8 +206,8 @@ void create_account()
         std::cout << "If you would like to cancel your account creation, type 'exit' " << std::endl;
         std::cin >> user;
 
-        //Offer option to retry or return to main menu
-        if(user == "Exit" || user == "exit")
+        std::string exitcheck = tolowerstring(user);
+        if(exitcheck == "exit")
         {
             std::cout << "Returning to main menu." << std::endl;
             return;
@@ -412,51 +417,39 @@ void display_QAdir_menu()
     
         std::cout << "\t1. View inventory\n";
         std::cout << "\t2. Add part information to inventory\n";
-        std::cout << "\t3. Add product information to inventory\n";
-        std::cout << "\t4. Create inspection requirement\n";
-        std::cout << "\t5. View Final Inspections\n";
-        std::cout << "\t6. Approve and certify final product\n";
-        std::cout << "\t7. Logout\n";
+        std::cout << "\t3. Create inspection requirement\n";
+        std::cout << "\t4. View Final Inspections\n";
+        std::cout << "\t5. Approve and certify final product\n";
+        std::cout << "\t6. Logout\n";
     
         std::cin >> option;
-        
-        if (option < 1 | option > 7)
+
+        //view or approve final inspections
+        switch (option)
         {
-            std::cout << "Option is not valid. Please try again.\n";
-        }
-        else
-        {
-            //view or approve final inspections
-            switch (option)
-            {
-                case 1:
-                    view_all_inventory();
-                    break;
-                    
-                case 2:
-                    add_part_menu();
-                    break;
-                    
-                case 3:
-                    add_product();
-                    break;
-                    
-                case 4:
-                    create_inspection_requirements();
-                    break;
-                    
-                case 5:
-                    view_final_product_inspections();
-                    break;
-                    
-                case 6:
-                    approve_inspection("Quality", "QA director");
-                    break;
-                case 7:
-                    std::cout << "Goodbye!\n";
-                    goto exitwhileloop;
-            }
-            
+            case 1:
+                view_all_inventory();
+                break;
+                
+            case 2:
+                add_part_menu();
+                break;
+                
+            case 3:
+                create_inspection_requirements();
+                break;
+                
+            case 4:
+                view_final_product_inspections();
+                break;
+                
+            case 5:
+                approve_inspection("Quality", "QA director");
+                break;
+            case 6:
+                std::cout << "Goodbye!\n";
+                goto exitwhileloop;
+            default: std::cout << "Option is not valid. Please try again.\n";
         }
         
     }
@@ -496,11 +489,11 @@ void display_invassoc_menu()
                     break;
                     
                 case 2:
-                    receive_material();
+                    receive_part_menu();
                     break;
                     
                 case 3:
-                    pull_wo();
+                    pull_wo_menu();
                     break;
                     
                 case 4:
@@ -716,7 +709,7 @@ void send_email(int insp_num)
 void add_part_menu()
 {
     int supp_num;
-    std::string part_desc, supp_name,product;
+    std::string part_desc, supp_name,item;
     
     
     std::cout << "Enter the new part description: ";
@@ -728,39 +721,27 @@ void add_part_menu()
     std::cout << "Enter the supplier's part number: ";
     std:: cin >> supp_num;
     
-    std::cout << "Is this item a product? (y/n)";
-    std::cin >> product;
-
-    for(char &c : product)
-    {
-        c = std::tolower(c);
-    }
-
-    while(product != "y" && product != "n")
-    {
-        std::cout << "Invalid entry, please try again, or enter 'exit' to return: ";
-        std::cin >> product;
-        for(char &c : product)
-        {
-            c = std::tolower(c);
-        }
-        if(product == "exit")
-        {
-            //Log exit event
-            //file_logger->info("exit at username input");
-            std::cout << "Returning to main menu." << std::endl;
-            return;
-        }
-    }
-    int product_int;
-    if(product == "y") product_int = 1;
-    else product_int = 0;
+    std::cout << "Is this item a material, product, or accessory? ";
+    std::cin >> item;
     
+
+    item = tolowerstring(item);
+    while(item != "material" && item != "product" && item != "accessory")
+    {
+        std::cout << "Invalid input, please re-enter: ";
+        std::cin >> item;
+        item = tolowerstring(item);
+    }
+
+    int sel;
+    if(item == "material") sel = 0;
+    else if (item == "product") sel = 1;
+    else sel = 2;
+
     //query to add information to Materials table
     std::cout << "Adding part to inventory list...";
-    add_part(part_desc,product_int);
-
-
+    add_part(part_desc,sel);
+    add_part_supplier(get_part_id(part_desc),supp_num,supp_name);
 
     std::cout << "Part added!\n";
 }
@@ -846,19 +827,132 @@ void create_inspection_requirements()
 }
 
 //inventory associatae
-void receive_material()
+void receive_part_menu()
 {
-    //add material into stores
+    std::string pdesc;
+    std::cout << "Enter the name of the part that is being received: ";
+    std::cin >> pdesc;
+
+
+
+    while(!(part_exists(get_part_id(pdesc))))
+    {
+        std::cout << "That part does not exist in the system, please enter a new name, or 'exit' to return: ";
+        std::cin >> pdesc;
+        std::string exitcheck = tolowerstring(pdesc);
+        if(exitcheck == "exit")
+        {
+            //Log exit event
+            //file_logger->info("exit at username input");
+            std::cout << "Returning to main menu." << std::endl;
+            return;
+        }
+    }
+
+    int qty;
+    std::cout << "What is the quantity being received? ";
+    std::cin >> qty;
+
+    int type = get_part_type(get_part_id(pdesc));
+    switch(type)
+    {
+        case 0: 
+            receive_material(get_part_id(pdesc),qty);
+            std::cout << "Quantity of: " << qty << " successfully received! Returning to menu.";
+            break;
+
+        case 1:
+            std::cout << "ERROR: Attempting to add product. Returning to menu.\n";
+            break;
+
+        case 2:
+            receive_material_accessory(get_part_id(pdesc),qty);
+            std::cout << "Quantity of: " << qty << " successfully received! Returning to menu.";
+            break;
+
+    }
 }
 
-void pull_wo()
+void pull_wo_menu()
 {
-    //view bom
-    //subtract mats from mat locations and add to wip
-    //ask how many products to build
+    std::string name;
+
+    std::cout << "Enter the name of the product to see the BOM for: ";
+    std::cin >> name;
+
+    while(!(part_exists(get_part_id(name))) && get_part_type(get_part_id(name)) != 1)
+    {
+        std::cout << "Product not found. Please re-enter the name or type 'exit' to return: ";
+        std::cin >> name;
+
+        std::string exitcheck = tolowerstring(name);
+        if(exitcheck == "exit")
+        {
+            //Log exit event
+            //file_logger->info("exit at username input");
+            std::cout << "Returning to main menu." << std::endl;
+            return;
+        }
+    }
+
+    if(!part_loc_exists(get_part_id(name)))
+    {
+        std::cout << "ERROR: Part is not in storage. Returning to main menu.\n";
+        return;
+    }
+
+    std::vector<int>mats = get_bom_id(get_part_id(name));
+
+    for(int i = 0; i < mats.size(); i++)
+    {
+        if(!part_loc_exists(mats[i]))
+        {
+            std::cout << "Material: " << tolowerstring(name) << " is not available in storage, returning to main menu.\n";
+            return;
+        }
+    }
+    std::cout << "How many products would you like to order? ";
+    int qty;
+    std::cin >> qty;
+    getquant: ;
+    
+    for(int i = 0; i < mats.size(); i++)
+    {
+        if((qty*get_mat_quantity(get_part_id(name),mats[i])) > get_stores_count(mats[i]))
+        {
+            std::cout << "ERROR: Insufficient quantity of: " << tolowerstring(get_part_name(mats[i])) << " available in stores.\n";
+            std::string str;
+            std::cout << "Please re-enter a value or type 'exit' to return to the menu: ";
+            std::cin >> str;
+            if(str == "exit")
+            {
+                //Log exit event
+                //file_logger->info("exit at username input");
+                std::cout << "Returning to main menu." << std::endl;
+                return;
+            }
+            //add integer checking error handling
+            qty = std::stoi(str);
+            goto getquant;
+        }
+    }
+
+    pull_wo(get_part_id(name),mats,qty);
+
+    std::cout << "\nOrder successfully placed! Returning to main menu." << std::endl;
 }
 
 void backflush_product()
 {
     //remove wip for a product and add to fgi
+}
+
+std::string tolowerstring(std::string str)
+{
+    std::string strl = str;
+    for(char &c : strl)
+    {
+        c = std::tolower(c);
+    }
+    return strl;
 }
