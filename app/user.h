@@ -5,7 +5,7 @@
 
 
 struct User{
-    int id=0,super_ssn=0,dno=0;
+    int id=0,dno=0;
     std::string ssn="",lname="",fname="",username="",job_title="";
 };
 

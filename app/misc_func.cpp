@@ -740,8 +740,9 @@ void add_part_menu()
 
     //query to add information to Materials table
     std::cout << "Adding part to inventory list...";
-    add_part(part_desc,sel);
-    add_part_supplier(get_part_id(part_desc),supp_num,supp_name);
+    add_part(tolowerstring(part_desc),sel);
+    add_part_supplier(get_part_id(tolowerstring(part_desc)),supp_num,supp_name);
+    add_part_location(get_part_id(tolowerstring(part_desc)),0,0,0,0,0);
 
     std::cout << "Part added!\n";
 }
@@ -944,7 +945,74 @@ void pull_wo_menu()
 
 void backflush_product()
 {
-    //remove wip for a product and add to fgi
+    std::string name;
+    
+    std::cout << "Enter the name of a product to backflush: ";
+    std::cin>>name;
+    while(!part_exists(get_part_id(name)) && get_part_type(get_part_id(name)) != 1)
+    {
+        std::cout << "Invalid product. Please re-enter a name, or type 'exit' to leave: ";
+        std::cin>>name;
+        std::string exitcheck = tolowerstring(name);
+        if(exitcheck == "exit")
+        {
+               //Log exit event
+                //file_logger->info("exit at username input");
+                std::cout << "Returning to main menu." << std::endl;
+                return;
+        }
+    }
+    int product = get_part_id(name);
+    std::vector<int>mats = get_bom_id(get_part_id(name));       //vector containing materials in order
+    std::vector<int>count;                                      //vector containing the quantity for each material
+    std::vector<int>max;        //vector containing maximum products that can be created with available material 
+    for(int i = 0; i < mats.size();i++)
+    {
+        int qty = get_wip_count(mats[i]);
+        if(qty == 0)
+        {
+            std::cout<< "Quantity for material '" << get_part_name(mats[i]) << "' is 0. Unable to backflush this product. Returning to main menu.\n";
+            return;
+        }
+        count.push_back(qty);
+        int n = get_parts_needed(product,mats[i])%qty;
+        if(n == 0)
+        {
+            std::cout << "Insufficient material available to backflush this product. Returning to the main menu.\n";
+            return;
+        }
+        max.push_back(get_parts_needed(product,mats[i])%qty);
+    }
+
+    int min = *std::min_element(max.begin(), max.end());
+    std::string exitcheck;
+    std::cout << min << " products can be backflushed. Would you like to continue? (Y/N)";
+    std::cin >> exitcheck;
+
+    while(tolowerstring(exitcheck) != "n" and tolowerstring(exitcheck) != "y")
+    {
+        std::cout << "Invalid input, please enter 'Y' to continue, or 'N' to return to the menu.\n";
+        std::cin >> exitcheck;
+        if(tolowerstring(exitcheck) == "n")
+        {
+            std::cout << "Process cancelled. Returning main menu.\n";
+            return;
+        }
+        else if(tolowerstring(exitcheck) == "y") break;
+
+    }
+
+    int backflush;
+    std::cout << "Please enter the desired quantity to backflush: ";
+    std::cin>>backflush;
+    while(backflush > min)
+    {
+        std::cout << "Invalid amount, please enter a new value: ";
+        std::cin >> backflush;
+    }
+    backflush_product(product,backflush);
+    std::cout<<"Order completed. Returning to main menu.\n";
+    return;
 }
 
 std::string tolowerstring(std::string str)

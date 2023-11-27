@@ -38,7 +38,7 @@ void edit_dept(int dnum, std::string d_desc);    //edit description for a depart
 void assign_dept_mgr(std::string ssn, int dnum); //assign a new manager for a department
 
 std::vector<int> get_supervisee(std::string ssn);       //returns vector containing supervisee ids for a supervisor (user -> ssn used in argument)
-std::vector<int> get_inventory(int dnum);       //returns vector containing material_nums for their department
+void  get_inventory(int pnum);       //returns information for a part number
 
 std::vector<int> get_bom_id(int prnum);   //returns a vector containing the material id for each material used in a product
 std::vector<std::string> get_bom_desc(std::vector<int> id_vec); //returns a vector containing material descriptions for a vector of material ids
@@ -47,22 +47,20 @@ void pull_wo(int prnum, std::vector<int> mat_ids, int qty);
 void view_IQC_list();
 void create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size);
 void approve_inspection(int insp_num);
-void view_inspection(int insp_num);
 
 void move_to_IPQC(int pn);
 void move_to_FQC(int pn);
 void receive_material(int pn, int qty);
 void receive_material_accessory(int pn, int qty);
-void backflush_product(int pn);
+void backflush_product(int pn,int qty);
 void move_to_IQC(int pn);
 void move_to_OQC(int pn);        //moves product from IPQC to OQC (STORES to SHIP in PRODUCT table)
 int get_insp_num(int pnum);     //get inspection number for a given product/part number
 
 
 //SQL Queries to view various inspection lists all below
-void view_inspections(std::string dept_name);
-void view_inspections(std::string dept_name, std::string title);
-void view_inspection_requirements(int insp_num);
+void view_inspection(int insp_num, std::string emp_role);
+void view_inspection_requirements(int pnum);
 
 //SQL Queries for Adding New Inspections
 int get_next_insp_num();
@@ -87,20 +85,26 @@ std::string get_part_name(int pnum);
 //SQL Queries for PART_SUPPLIER 
 void add_part_supplier(int pnum, int supp_num, std::string supp_name);
 void edit_part_supplier(int pnum, int supp_num, std::string supp_name);
+int get_parts_needed(int pnum,int mat_num);  //returns qty of material needed for a product
 
 //SQL Queries for PART_LOCATION
 void add_part_location(int pnum, int INSP, int STORES, int WIP, int QC, int FGI);     //add tuple to part locations 
 void edit_part_location(int pnum, int INSP, int STORES, int WIP, int QC, int FGI);
 bool part_loc_exists(int pnum);                   //check if a material is already present in material locations 
-int get_stores_count(int pnum);         //returns values in STORES for a part
 
+int get_insp_count(int pnum);
+int get_stores_count(int pnum);         //returns values in each location for a part
+int get_wip_count(int pnum);
+int get_qc_count(int pnum);
+int get_fgi_count(int pnum);
 
 //SQL Queries for PART_LISt
 void add_kit(int pr_num,std::vector<int>&mat_list,std::vector<int>&qty);            //add a part list for a product and its materials, reference material id and quantity through passed arrays
 int get_mat_quantity(int pr_num,int mat_num);
 
 //SQL Queries for Creating Inspection Requirements
-void create_requirements(int pnum, std::string requirement, std::string res_type);
+void create_requirements(int pnum, std::string requirement, std::string insp_area,std::string res_type);
+void create_insp_req(int pnum, std::string pdesc,int sample_size);
 
 
 #endif
