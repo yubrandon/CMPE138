@@ -69,7 +69,7 @@ CREATE TABLE PART_LIST(
 CREATE TABLE INSPECTION_REQ(
     IR_pnum int,
     IR_pdesc varchar(50),
-    Sample_size int,
+    Sample_size float,
     CONSTRAINT IR_PK PRIMARY KEY (IR_pnum)
 );
 

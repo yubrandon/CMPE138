@@ -38,7 +38,8 @@ void edit_dept(int dnum, std::string d_desc);    //edit description for a depart
 void assign_dept_mgr(std::string ssn, int dnum); //assign a new manager for a department
 
 std::vector<int> get_supervisee(std::string ssn);       //returns vector containing supervisee ids for a supervisor (user -> ssn used in argument)
-void  get_inventory(int pnum);       //returns information for a part number
+void get_inventory(int pnum);       //returns information for a part number
+void get_inventory_all();
 
 std::vector<int> get_bom_id(int prnum);   //returns a vector containing the material id for each material used in a product
 std::vector<std::string> get_bom_desc(std::vector<int> id_vec); //returns a vector containing material descriptions for a vector of material ids

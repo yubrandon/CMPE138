@@ -409,6 +409,36 @@ void get_inventory(int pnum)
     delete res;
 }
 
+void get_inventory_all()
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+    sql::Statement *stmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    stmt = con->createStatement();
+    res = stmt -> executeQuery("SELECT P_num from PART");
+    std::vector<int>pnum;
+    while(res->next())
+    {
+        pnum.push_back(res->getInt(1));
+    }
+    for(int i = 0;i < pnum.size();i++)
+    {
+        get_inventory(pnum[i]);
+    }
+
+
+    delete con;
+    delete pstmt;
+    delete res;
+}
+
 /* -------------------------------------------------------------- */
 
 std::vector<int> get_bom_id(int pnum)

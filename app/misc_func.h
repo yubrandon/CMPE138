@@ -59,6 +59,7 @@ void view_final_product_inspections();
 void receive_part_menu();
 void pull_wo_menu();
 void backflush_product();
+std::string get_user_insp_area();
 
 std::string tolowerstring(std::string str);
 
