@@ -1898,7 +1898,7 @@ void move_QC_to_FGI(int p_num, int qty)
 
 
 //Sample state insertion
-/*void state_init()
+void state_init()
 {
     sql::Driver *driver;
     sql::Connection *con;
@@ -1913,11 +1913,49 @@ void move_QC_to_FGI(int p_num, int qty)
 
 
     //create departments
+    create_user("123456789", "wdoe1", sha256("dsfsdfs"), "Doe", "Willie");
+    assign_dept(1, 2);
+    assign_role(1, "IQC Inspector");
 
+    create_user("111222333", "esmith5", sha256("afwf345j"), "Smith", "Eddie");
+    assign_dept(2, 2);
+    assign_role(1, "OQC Inspector");
+
+    create_user("444555666", "kmunoz2", sha256("df456sd"), "Munoz", "Kara");
+    assign_dept(3, 2);
+    assign_role(1, "QA Director");
+
+    create_user("777888999", "csharma1", sha256("g5m1y6u"), "Sharma", "Chas");
+    assign_dept(4, 3);
+    assign_role(1, "Inventory Associate");
+
+    create_user("453453453", "lpeterson1", sha256("65r4h6wr6"), "Peterson", "Laila");
+    assign_dept(5, 1);
+    assign_role(1, "CEO");
+
+    create_user("786786786", "oreid1", sha256("rge56r"), "Reid", "Owen");
+    assign_dept(6, 3);
+    assign_role(1, "Technician");
+
+    create_user("654987321", "sadil1", sha256("t1n5w6"), "Adil", "Syed");
+    assign_dept(7, 4);
+    assign_role(1, "Engineering Manager");
+
+    create_user("123456789", "mli7", sha256("nrt41n"), "Li", "Mei");
+    assign_dept(8, 3);
+    assign_role(1, "Operations Manager");
+
+    //assign_emp_id();
+    //get_emp_id("123456789");
+
+    create_dept(1, "Human Resources");
+    create_dept(2, "Quality");
+    create_dept(3, "Operations");
+    create_dept(4, "Engineering");
+    
     
 
     delete con;
     delete stmt;
     delete pstmt;
 }
-*/
