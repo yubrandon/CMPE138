@@ -101,7 +101,7 @@ CREATE TABLE INSP_AREA(
 
 CREATE TABLE INSP_REQ_RES(
     Insp_num int,
-    Insp_req varchar(50),
+    Insp_req varchar(200),
     Insp_res varchar(50),
     Qty_passed int,
     CONSTRAINT INSP_RES_FK FOREIGN KEY (Insp_num) REFERENCES INSPECTIONS (Insp_num) ON DELETE SET NULL ON UPDATE CASCADE
