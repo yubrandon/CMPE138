@@ -23,7 +23,7 @@ CREATE TABLE EMPLOYEE(
 CREATE TABLE EMPLOYEE_INFO(
     ID int,
     Dno int,
-    Job_role varchar(10),
+    Job_title varchar(10),
     CONSTRAINT EMP_ID_FK FOREIGN KEY (ID) REFERENCES EMPLOYEE(ID) ON DELETE SET NULL ON UPDATE CASCADE 
 );
 
@@ -70,7 +70,7 @@ CREATE TABLE PART_LIST(
 CREATE TABLE INSP_REQ(
     IR_pnum int,
     IR_pdesc varchar(50),
-    Sample_size int,
+    Sample_size float,
     CONSTRAINT IR_PK PRIMARY KEY (IR_pnum)
 );
 
@@ -103,6 +103,7 @@ CREATE TABLE INSP_REQ_RES(
     Insp_num int,
     Insp_req varchar(50),
     Insp_res varchar(50),
+    Qty_passed int,
     CONSTRAINT INSP_RES_FK FOREIGN KEY (Insp_num) REFERENCES INSPECTIONS (Insp_num) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
@@ -161,7 +162,7 @@ INSERT INTO PART_LIST VALUES ( 4, 13, 1);
 INSERT INTO PART_LIST VALUES ( 4, 14, 1);
 
 INSERT INTO INSP_REQ VALUES ( 1, "15 inch monitor", 1);
-INSERT INTO INSP_REQ VALUES (10, "Power adapter(A)", 1);
+INSERT INTO INSP_REQ VALUES (10, "Power adapter(A)", 0.25);
 
 INSERT INTO REQUIREMENTS VALUES (10, "Verify adapter is deburred and free", "IQC", "visual");
 INSERT INTO REQUIREMENTS VALUES (10, "Verify light turns on when plugging in", "IQC", "visual");
@@ -169,11 +170,3 @@ INSERT INTO REQUIREMENTS VALUES ( 1, "Test voltage output to verify 5V +- .10V",
 INSERT INTO REQUIREMENTS VALUES ( 1, "Turn screen on to verify all pixels are working properly", "OQC", "visual");
 INSERT INTO REQUIREMENTS VALUES ( 1, "Verify documentation related to build is complete", "FQC", "visual");
 INSERT INTO REQUIREMENTS VALUES ( 1, "Verify label has no smears, blurs, or bumps", "FQC", "visual");
-
-
-INSERT INTO INSP_REQ_RES VALUES (1, "Verify adapter is deburred and free of damage", "pass", 10);
-INSERT INTO INSP_REQ_RES VALUES (1,"Verify light turns on when plugging in", "pass", 10);
-INSERT INTO INSP_REQ_RES VALUES (2, "Test voltage output to verify 5V +- .10V", "5", 15);
-INSERT INTO INSP_REQ_RES VALUES (2, "Turn screen on to verify all pixels are working properly", "pass", 15);
-INSERT INTO INSP_REQ_RES VALUES (3, "Verify documentation related to build is complete", "pass", 20);
-INSERT INTO INSP_REQ_RES VALUES (3, "Verify label has no smears, blurs, or bumps", "fail", 18);

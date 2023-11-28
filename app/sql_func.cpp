@@ -335,7 +335,7 @@ void edit_dept(int dnum, std::string d_desc)
     delete pstmt;
 }
 
-void assign_dept_mgr(std::string ssn, int dnum)
+void assign_dept_mgr(int dnum, int id)
 {
     sql::Driver *driver;
     sql::Connection *con;
@@ -346,7 +346,7 @@ void assign_dept_mgr(std::string ssn, int dnum)
     con->setSchema("InventoryDB");
 
     pstmt = con->prepareStatement("UPDATE DEPARTMENT SET Dept_mgr = ? WHERE Dnumber = ?");
-    pstmt -> setString(1,ssn);
+    pstmt -> setInt(1,id);
     pstmt -> setInt(2,dnum);
     pstmt -> executeUpdate();
 
@@ -1900,17 +1900,12 @@ void move_QC_to_FGI(int p_num, int qty)
 //Sample state insertion
 void state_init()
 {
-    sql::Driver *driver;
-    sql::Connection *con;
-    sql::Statement *stmt;
-    sql::PreparedStatement *pstmt;
-
     SHA256 sha256;
-
-    driver = get_driver_instance();
-    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
-    con->setSchema("InventoryDB");
-
+    create_dept(1, "Human Resources");
+    create_dept(2, "Quality");
+    create_dept(3, "Operations");
+    create_dept(4, "Engineering");
+    //departments must be created first before assigning to employees
 
     //create departments
     create_user("123456789", "wdoe1", sha256("dsfsdfs"), "Doe", "Willie");
@@ -1945,27 +1940,23 @@ void state_init()
     assign_dept(8, 3);
     assign_role(1, "Operations Manager");
 
+    assign_dept_mgr(4,7);
+    assign_dept_mgr(3,8);
+
     //assign_emp_id();
     //get_emp_id("123456789");
 
-    create_dept(1, "Human Resources");
-    create_dept(2, "Quality");
-    create_dept(3, "Operations");
-    create_dept(4, "Engineering");
-    
-    add_inspection(1, 1010, 10, "IQC");
-    update_inspection_requirements(1, 1010, "10-24-2023", "Verify adapter is deburred and free of damage", "visual", 10);
-    update_inspection_requirements(1, 1010, "10-24-2023", "Verify light turns on when plugging in", "visual", 10);
+    //argument #2 for update_inspection_requirements is id for person performing inspection
+    add_inspection(1, 10, 10, "IQC");
+    update_inspection_requirements(1, 1, "10-24-2023", "Verify adapter is deburred and free of damage", "visual", 10);
+    update_inspection_requirements(1, 1, "10-24-2023", "Verify light turns on when plugging in", "visual", 10);
 
-    add_inspection(2, 1001, 15, "OQC");
-    update_inspection_requirements(2, 1001, "10-30-2023", "Test voltage output to verify 5V +- .10V", "Volts", 15);
-    update_inspection_requirements(2, 1001, "10-30-2023", "Turn screen on to verify all pixels are working properly", "visual", 15);
+    add_inspection(2, 1, 15, "OQC");
+    update_inspection_requirements(2, 2, "10-30-2023", "Test voltage output to verify 5V +- .10V", "Volts", 15);
+    update_inspection_requirements(2, 2, "10-30-2023", "Turn screen on to verify all pixels are working properly", "visual", 15);
 
-    add_inspection(3, 1001, 20, "FQC");
-    update_inspection_requirements(3, 1001, "11-05-2023", "Verify documentation related to build is complete", "visual", 20);
-    update_inspection_requirements(3, 1001, "11-05-2023", "Verify label has no smears, blurs, or bumps", "visual", 20);
+    add_inspection(3, 1, 20, "FQC");
+    update_inspection_requirements(3, 3, "11-05-2023", "Verify documentation related to build is complete", "visual", 20);
+    update_inspection_requirements(3, 3, "11-05-2023", "Verify label has no smears, blurs, or bumps", "visual", 20);
 
-    delete con;
-    delete stmt;
-    delete pstmt;
 }

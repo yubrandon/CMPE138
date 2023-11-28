@@ -35,7 +35,7 @@ void assign_role(int id, std::string role);               //assign job_title for
 
 void create_dept(int dnum,std::string d_desc);  //add a new department tuple
 void edit_dept(int dnum, std::string d_desc);    //edit description for a department
-void assign_dept_mgr(std::string ssn, int dnum); //assign a new manager for a department
+void assign_dept_mgr(int dnum, int id); //assign a new manager for a department
 
 std::vector<int> get_supervisee(std::string ssn);       //returns vector containing supervisee ids for a supervisor (user -> ssn used in argument)
 void get_inventory(int pnum);       //returns information for a part number

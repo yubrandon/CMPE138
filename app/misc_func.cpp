@@ -24,7 +24,7 @@ void initialize()
 {
     //Initialize the database
     db_init();
-    //state_init();
+    state_init();
 }
 
 void main_menu()
@@ -1124,25 +1124,22 @@ void pull_wo_menu()
 
 void backflush_product()
 {
-    std::string name;
-    
-    std::cout << "Enter the name of a product to backflush: ";
-    std::cin>>name;
-    while(!part_exists(get_part_id(name)) && get_part_type(get_part_id(name)) != 1)
+    int id;
+    std::cout << "Enter the id of a product to backflush: ";
+    std::cin>>id;
+
+    while(!part_exists(id) && get_part_type(id) != 1)
     {
-        std::cout << "Invalid product. Please re-enter a name, or type 'exit' to leave: ";
-        std::cin>>name;
-        std::string exitcheck = tolowerstring(name);
-        if(exitcheck == "exit")
+        std::cout << "Invalid product. Please re-enter the id: (Enter 0 to return to the menu.)";
+        std::cin>>id;
+        if(id == 0)
         {
-               //Log exit event
-                //file_logger->info("exit at username input");
-                std::cout << "Returning to main menu." << std::endl;
-                return;
+            std::cout << "Returning to the main menu...\n";
+            return;
         }
     }
-    int product = get_part_id(name);
-    std::vector<int>mats = get_bom_id(get_part_id(name));       //vector containing materials in order
+    int product = id;
+    std::vector<int>mats = get_bom_id(id);       //vector containing materials in order
     std::vector<int>count;                                      //vector containing the quantity for each material
     std::vector<int>max;        //vector containing maximum products that can be created with available material 
     for(int i = 0; i < mats.size();i++)
