@@ -61,7 +61,7 @@ CREATE TABLE PART_SUPPLIER(
 CREATE TABLE PART_LIST(
     PMat_num int,
     PPr_num int,
-    Mat_qty int
+    Mat_qty int,
     CONSTRAINT P_MAT_FK FOREIGN KEY (PMat_num) REFERENCES PART (P_num) ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT P_PROD_FK FOREIGN KEY (PPr_num) REFERENCES PART (P_num) ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -83,7 +83,7 @@ CREATE TABLE REQUIREMENTS(
 
 CREATE TABLE INSPECTIONS(
     Insp_num int,
-    Insp_pnum varchar(5),
+    Insp_pnum int,
     Emp_id int,
     Pass_fail boolean,
     Insp_date DATE,

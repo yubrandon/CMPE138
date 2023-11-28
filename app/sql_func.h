@@ -26,8 +26,8 @@ bool user_exists(std::string user);     //return boolean indicating if username 
 bool ssn_exists(std::string ssn);               //return boolean indicating if ssn exists in db
 void get_user(User *user);
 bool verify_user(std::string user, std::string pw);         //return boolean indicating if username and password input exist in a tuple
-void create_user(std::string ssn, std::string name, std::string user, std::string pw, std::string lname, std::string fname);  //add tuple to db using user inputs
-
+void create_user(std::string ssn, std::string user, std::string pw, std::string lname, std::string fname);  //add tuple to db using user inputs
+int get_emp_id(int ssn);
 
 //Supervisor/Department manager
 void assign_dept(int id,int dnum);      //assign department number for a new employee
@@ -62,17 +62,28 @@ int get_insp_num(int pnum);     //get inspection number for a given product/part
 //SQL Queries to view various inspection lists all below
 void view_inspection(int insp_num, std::string emp_role);
 void view_inspection_requirements(int pnum);
+/* ------------------------------------------- VIEW SQL FUNCTIONS ----------------------------------------------------- */
+void view_inspection(int insp_num);
+void view_inspections(std::string dept_name, std::string title);
+void view_inspection_requirements(int insp_num);
 
-//SQL Queries for Adding New Inspections
-int get_next_insp_num();
-int get_account();
-int get_sample_size(int insp_num);
-void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area);
+/* -------------------------------------- ADD NEW INSPECTION SQL FUNCTIONS ---------------------------------------------- */
+void create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size);
+int get_next_insp_num(); //lanaiya
+double get_sample_size(int insp_num); //lanaiya
+void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area); //brandon
 
-//SQL Quesries for Approving Inspections
-int get_qty_inspected(int insp_num);
-int calculate_fpy(int insp_num);
-void set_insp_pf(std::string);
+/* -------------------------------------- APPROVE INSPECTION SQL FUNCTIONS ---------------------------------------------- */
+void approve_inspection(int insp_num); //still used?
+int get_qty_inspected(int insp_num); //lanaiya
+int calculate_fpy(int insp_num); //lanaiya
+void set_insp_pf(int insp_num, bool pf); //lanaiya
+void update_inspection_requirements(int insp_num, std::string insp_req, std::string insp_res, int qty_pass); //brandon
+std::vector<std::string> get_insp_req(int insp_num);
+std::vector<std::string> get_insp_res_type(int insp_num);
+std::string get_ir_desc(int insp_num);
+int get_insp_pnum(int insp_num);
+
 
 //SQL Queries for PART
 //int get_next_mat_num();
@@ -106,6 +117,20 @@ int get_mat_quantity(int pr_num,int mat_num);
 //SQL Queries for Creating Inspection Requirements
 void create_requirements(int pnum, std::string requirement, std::string insp_area,std::string res_type);
 void create_insp_req(int pnum, std::string pdesc,int sample_size);
+
+/* ------------------------------------ MOVE INSP TO FGI SQL FUNCTIONS ------------------------------------------------ */
+void move_INSP_to_STORES(int p_num, int qty); //lanaiya
+void move_STORES_to_WIP(int p_num, int qty); //lanaiya
+void move_WIP_to_QC(int p_num, int qty); //lanaiya
+void move_QC_to_FGI(int p_num, int qty); //lanaiya
+
+//ACCESSORS AND MODIFIERS FOR SETTING INDIVIDUAL ATTRIBUTES
+void set_string_attribute(std::string table, std::string attr, std::string table_value, std::string attr_value);
+void set_bool_attribute(std::string table, std::string attr, std::string table_value, bool attr_value);
+void set_int_attribute(std::string table, std::string attr, std::string table_value, int attr_value);
+void set_double_attribute(std::string table, std::string attr, std::string table_value, double attr_value);
+
+// SQL FUNCTIONS NO LONGER NEEDED
 
 
 #endif
