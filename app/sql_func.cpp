@@ -998,7 +998,6 @@ void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area) /
 {
     sql::Driver *driver;
     sql::Connection *con;
-    sql::ResultSet *res;
     sql::PreparedStatement *pstmt;
 
     driver = get_driver_instance();
@@ -1017,7 +1016,6 @@ void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area) /
     pstmt->execute();
 
     delete con;
-    delete res;
     delete pstmt;
 }
 
