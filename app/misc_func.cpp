@@ -454,7 +454,7 @@ void display_QAdir_menu()
                 break;
                 
             case 2:
-                file_logger->info("added part");
+                file_logger->info("adding part");
                 add_part_menu();
                 break;
                 
@@ -1068,13 +1068,13 @@ void backflush_product()
             return;
         }
         count.push_back(qty);
-        int n = get_parts_needed(product,mats[i])%qty;
+        int n = get_parts_needed(product,mats[i])/qty;
         if(n == 0)
         {
             std::cout << "Insufficient material available to backflush this product. Returning to the main menu.\n";
             return;
         }
-        max.push_back(get_parts_needed(product,mats[i])%qty);
+        max.push_back(get_parts_needed(product,mats[i])/qty);
     }
 
     int min = *std::min_element(max.begin(), max.end());
