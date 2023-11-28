@@ -116,12 +116,12 @@ void login()
     file_logger->info("complete\n");
     std::cout << "Successful login!" << std::endl;
     
-    std::string job = tolowerstring(currUser->job_title);
-    if(job == "iqc inspector") loginas_IQC_inspector();
-    else if(job == "oqc inspector") loginas_OQC_inspector();
-    else if(job == "qa director") loginas_QAdirector();
-    else if(job == "inventory associate") loginas_inv_associate();
-    else if(job == "technician") loginas_technician();
+    std::string job = currUser->job_title;
+    if(job == "IQC Inspector") loginas_IQC_inspector();
+    else if(job == "OQC Inspector") loginas_OQC_inspector();
+    else if(job == "QA Director") loginas_QAdirector();
+    else if(job == "Inventory Associate") loginas_inv_associate();
+    else if(job == "Technician") loginas_technician();
 
     //user_test();
 
@@ -648,7 +648,7 @@ void view_all_inventory()
 void view_IQC_inspections()
 {
     std::cout << "Opening list of IQC inspections...\n";
-    view_inspections("Quality", "IQC inspector");
+    view_inspections("Quality", "IQC Inspector");
     
 }
 
@@ -662,7 +662,7 @@ void view_IPQC_inspections()
 void view_OQC_inspections()
 {
     std::cout << "Opening list of OQC inspections...\n";
-    view_inspections("Quality", "OQC inspector");
+    view_inspections("Quality", "OQC Inspector");
     
 }
 
@@ -686,15 +686,15 @@ void add_new_inspections(std::string dept_name, std::string title)
     insp_num = get_next_insp_num();   
     
     //cin part_number
-    std::cout << "Enter the part number being inspected: ";
+    std::cout << "Enter the part number being inspected: (Enter 0 to exit)";
     std::cin >> pn;
-    
+    if(pn == 0) return;    
     //cin lot quantity
     std::cout << "Enter the total lot quantity: ";
     std::cin >> lot_qty;
     
     //query to pull sample_size for total quantity needed to pass
-    sample_size = get_sample_size(insp_num);
+    sample_size = get_sample_size(pn);
     insp_qty = lot_qty * sample_size;
 
     //set inspection area based on department and title
@@ -711,7 +711,7 @@ void add_new_inspections(std::string dept_name, std::string title)
     {
         if (title == "Technician") {   insp_area = "IPQC";   }
     }
-
+    
     //create requirements for part number
     bool add_more = true;
     int option;
@@ -721,6 +721,8 @@ void add_new_inspections(std::string dept_name, std::string title)
     {
         std::cout << "Enter the inspection requirement: ";
         std::cin >> requirement;
+
+        create_insp_req(pn,requirement,sample_size);
 
         std::cout << "Enter the expected result type: ";
         std::cin >> res_type;

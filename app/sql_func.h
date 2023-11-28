@@ -11,6 +11,7 @@
 
 #include "user.h"
 #include "sha256.h"
+#include "misc_func.h"
 #include "mysql_connection.h"
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
