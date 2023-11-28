@@ -77,13 +77,14 @@ void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area); 
 void approve_inspection(int insp_num); //still used?
 int get_qty_inspected(int insp_num); //lanaiya
 int calculate_fpy(int insp_num); //lanaiya
+
 void set_insp_pf(int insp_num, bool pf); //lanaiya
 void update_inspection_requirements(int insp_num,int id, std::string time, std::string insp_req, std::string insp_res, int qty_pass); //brandon
 std::vector<std::string> get_insp_req(int insp_num);
 std::vector<std::string> get_insp_res_type(int insp_num);
 std::string get_ir_desc(int insp_num);
 int get_insp_pnum(int insp_num);
-
+void set_insp_pf(std::string); //lanaiya
 
 //SQL Queries for PART
 //int get_next_mat_num();

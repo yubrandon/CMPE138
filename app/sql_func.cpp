@@ -1953,7 +1953,17 @@ void state_init()
     create_dept(3, "Operations");
     create_dept(4, "Engineering");
     
-    
+    add_inspection(1, 1010, 10, "IQC");
+    update_inspection_requirements(1, 1010, "10-24-2023", "Verify adapter is deburred and free of damage", "visual", 10);
+    update_inspection_requirements(1, 1010, "10-24-2023", "Verify light turns on when plugging in", "visual", 10);
+
+    add_inspection(2, 1001, 15, "OQC");
+    update_inspection_requirements(2, 1001, "10-30-2023", "Test voltage output to verify 5V +- .10V", "Volts", 15);
+    update_inspection_requirements(2, 1001, "10-30-2023", "Turn screen on to verify all pixels are working properly", "visual", 15);
+
+    add_inspection(3, 1001, 20, "FQC");
+    update_inspection_requirements(3, 1001, "11-05-2023", "Verify documentation related to build is complete", "visual", 20);
+    update_inspection_requirements(3, 1001, "11-05-2023", "Verify label has no smears, blurs, or bumps", "visual", 20);
 
     delete con;
     delete stmt;
