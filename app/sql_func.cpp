@@ -785,9 +785,57 @@ double get_sample_size(int insp_num)
 
 void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area) // brandon
 {
-    
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("INSERT INTO INSPECTIONS VALUES(?,?,NULL,NULL,NULL)");
+    pstmt->setInt(1,insp_num);
+    pstmt->setInt(2,pn);
+    pstmt -> execute();
+
+    pstmt = con->prepareStatement("INSERT INTO INSP_AREA VALUES(?,?,?)");
+    pstmt->setInt(1,insp_num);
+    pstmt->setString(2,insp_area);
+    pstmt->setInt(3,insp_qty);
+    pstmt->execute();
+
+    delete con;
+    delete res;
+    delete pstmt;
 }
 
+void update_inspection_requirements(int insp_num, int id, std::string time, std::string insp_req, std::string insp_res, int qty_pass)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE INSPECTIONS SET Emp_id = ?, Insp_date = ? WHERE Insp_num = ?");
+    pstmt->setInt(1,id);
+    pstmt->setString(2,time);
+    pstmt->setInt(3,insp_num);
+    pstmt->executeUpdate();
+
+    pstmt = con->prepareStatement("INSERT INTO INSP_REQ_RES VALUES (?,?,?,?)");
+    pstmt->setInt(1,insp_num);
+    pstmt->setString(2,insp_req);
+    pstmt->setString(3,insp_res);
+    pstmt->setInt(4,qty_pass);
+    pstmt->execute();
+
+    delete pstmt;
+    delete con;
+}
 //SQL Queries for Approving Inspections
 
 //SQL Query to get the quantity inspected from INSP_AREA
@@ -1156,7 +1204,17 @@ void state_init()
     create_dept(3, "Operations");
     create_dept(4, "Engineering");
     
-    
+    add_inspection(1, 1010, 10, "IQC");
+    update_inspection_requirements(1, 1010, "10-24-2023", "Verify adapter is deburred and free of damage", "visual", 10);
+    update_inspection_requirements(1, 1010, "10-24-2023", "Verify light turns on when plugging in", "visual", 10);
+
+    add_inspection(2, 1001, 15, "OQC");
+    update_inspection_requirements(2, 1001, "10-30-2023", "Test voltage output to verify 5V +- .10V", "Volts", 15);
+    update_inspection_requirements(2, 1001, "10-30-2023", "Turn screen on to verify all pixels are working properly", "visual", 15);
+
+    add_inspection(3, 1001, 20, "FQC");
+    update_inspection_requirements(3, 1001, "11-05-2023", "Verify documentation related to build is complete", "visual", 20);
+    update_inspection_requirements(3, 1001, "11-05-2023", "Verify label has no smears, blurs, or bumps", "visual", 20);
 
     delete con;
     delete stmt;

@@ -800,7 +800,7 @@ void approve_inspection(std::string dept_name, std::string title)
     
     //cout requirements and add cin for each
     //      insp_res, qty_passed 
-    update_inspection_requirements(insp_num);
+    //update_inspection_requirements(insp_num, 1001, "11-05-2023", "Verify documentation related to build is complete", "visual", 20));
     
     //calculate to ensure all qty_passed == qty_inspected
     fpy = calculate_fpy(insp_num);

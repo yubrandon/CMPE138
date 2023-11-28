@@ -60,7 +60,7 @@ void view_FQC_inspections();
 /* ------------------------------------------- ADD MENU FUNCTIONS ----------------------------------------------------- */
 void add_new_inspection(std::string dept_name, std::string title);
 void add_part();
-void create_inspection_requirements();
+void update_inspection_requirements();
 
 /* ------------------------------------------- APPROVE MENU FUNCTIONS ------------------------------------------------- */
 void approve_inspection(std::string dept_name, std::string title);

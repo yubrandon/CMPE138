@@ -53,13 +53,13 @@ void create_inspection(int pn, std::string pdesc, int insp_area, std::string req
 int get_next_insp_num(); //lanaiya
 double get_sample_size(int insp_num); //lanaiya
 void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area); //brandon
+void update_inspection_requirements(int insp_num, int id, std::string time, std::string insp_req, std::string insp_res, int qty_pass);
 
 /* -------------------------------------- APPROVE INSPECTION SQL FUNCTIONS ---------------------------------------------- */
 void approve_inspection(int insp_num); //still used?
 int get_qty_inspected(int insp_num); //lanaiya
 int calculate_fpy(int insp_num); //lanaiya
 void set_insp_pf(std::string); //lanaiya
-void update_inspection_requirements(int insp_num); //brandon
 
 /* ------------------------------------------- ADD PART SQL FUNCTIONS --------------------------------------------------- */
 int get_next_p_num(); //brandon
