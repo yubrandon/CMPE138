@@ -223,7 +223,7 @@ void create_account()
     std::cout << "Enter your last name: ";
     std::cin >> lname;
 
-    create_user(ssn_str, name, user,hashed_pw,lname,fname);
+    create_user(ssn_str, user,hashed_pw,lname,fname);
 
     //Log successful creation
     file_logger->info("complete\n");
