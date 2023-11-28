@@ -41,44 +41,62 @@ std::vector<int> get_inventory(int dnum);       //returns vector containing mate
 std::vector<int> get_bom_id(int prnum);   //returns a vector containing the material id for each material used in a product
 std::vector<std::string> get_bom_desc(std::vector<int> id_vec); //returns a vector containing material descriptions for a vector of material ids
 
-void view_IQC_list();
-void create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size);
-void approve_inspection(int insp_num);
+/* ------------------------------------------- VIEW SQL FUNCTIONS ----------------------------------------------------- */
 void view_inspection(int insp_num);
-
-void move_to_IPQC(int pn);
-void receive_material(int pn);
-void backflush_product(int pn);
-void move_to_IQC(int pn);
-void move_to_OQC(int pn);        //moves product from IPQC to OQC (STORES to SHIP in PRODUCT table)
-int get_insp_num(int pnum);     //get inspection number for a given product/part number
-
-
-//SQL Queries to view various inspection lists
-void view_inspections(std::string dept_name);
 void view_inspections(std::string dept_name, std::string title);
 void view_inspection_requirements(int insp_num);
 
-//SQL Queries for Adding New Inspections
-int get_next_insp_num();
-int get_account();
-int get_sample_size(int insp_num);
-void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area);
+/* -------------------------------------- ADD NEW INSPECTION SQL FUNCTIONS ---------------------------------------------- */
+void create_inspection(int pn, std::string pdesc, int insp_area, std::string requirements, std::string result_type, int sample_size);
+int get_next_insp_num(); //lanaiya
+double get_sample_size(int insp_num); //lanaiya
+void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area); //brandon
 
-//SQL Quesries for Approving Inspections
-int get_qty_inspected(int insp_num);
-int calculate_fpy(int insp_num);
-void set_insp_pf(std::string);
+/* -------------------------------------- APPROVE INSPECTION SQL FUNCTIONS ---------------------------------------------- */
+void approve_inspection(int insp_num); //still used?
+int get_qty_inspected(int insp_num); //lanaiya
+int calculate_fpy(int insp_num); //lanaiya
+void set_insp_pf(std::string); //lanaiya
+void update_inspection_requirements(int insp_num); //brandon
 
-//SQL Queries for Adding Material
-int get_next_mat_num();
-void add_to_materials(int mat_num, std::string mat_desc, std::string supp_name, int supp_num);
+/* ------------------------------------------- ADD PART SQL FUNCTIONS --------------------------------------------------- */
+int get_next_p_num(); //brandon
+void add_to_materials(int mat_num, std::string mat_desc, std::string supp_name, int supp_num); //brandon
 
-//SQL Queries for Adding Product
-int get_next_prod_num();
+/* ------------------------------------ CREATE REQUIREMENTS SQL FUNCTIONS ------------------------------------------------ */
+bool part_exists(int mat_prod_num); //brandon
+void create_requirements(int mat_prod_num, std::string requirement, std::string res_type); //brandon
 
-//SQL Queries for Creating Inspection Requirements
-bool part_exists(int mat_prod_num);
-void create_requirements(int mat_prod_num, std::string requirement, std::string res_type);
+/* ------------------------------------ MOVE INSP TO FGI SQL FUNCTIONS ------------------------------------------------ */
+void move_INSP_to_STORES(int p_num, int qty); //lanaiya
+void move_STORES_to_WIP(int p_num, int qty); //lanaiya
+void move_WIP_to_QC(int p_num, int qty); //lanaiya
+void move_QC_to_FGI(int p_num, int qty); //lanaiya
+
+/* -----------------------------------------INV ASSOC MENU FUNCTIONS -------------------------------------------------- */
+void receive_material(int pn); //brandon
+void backflush_product(int pn); //brandon
+int get_insp_num(int pnum);  //brandon
+
+
+//ACCESSORS AND MODIFIERS FOR SETTING INDIVIDUAL ATTRIBUTES
+void set_string_attribute(std::string table, std::string attr, std::string table_value, std::string attr_value);
+void set_bool_attribute(std::string table, std::string attr, std::string table_value, bool attr_value);
+void set_int_attribute(std::string table, std::string attr, std::string table_value, int attr_value);
+void set_double_attribute(std::string table, std::string attr, std::string table_value, double attr_value);
+
+// SQL FUNCTIONS NO LONGER NEEDED
+
+//SQL Queries for Adding Material and Product - removed since we are now combining mat/prod into single table
+// int get_next_mat_num();
+// int get_next_prod_num();
+
+// void view_IQC_list(); //clean up, no longer needed, now in view_inspections
+
+
+// MISC FUNCTIONS NO LONGER NEEDED
+// void add_material(); //no longer needed
+// void add_product(); //no longer needed
+// int get_next_mat_num(); //should be get_part_num
 
 #endif

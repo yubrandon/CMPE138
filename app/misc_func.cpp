@@ -48,6 +48,7 @@ void main_menu()
         }
     }
 }
+
 void login()
 {
     //Increment global counter for logging
@@ -118,6 +119,7 @@ void login()
    user_test();
 
 }
+
 void create_account()
 {
     /*
@@ -236,7 +238,6 @@ bool valid_ssn(std::string str)
 }
 
 
-/* ----------------------------------------------------------------------------------------- */
 
 /* ------------------------------------------------------------------------
  * Logins for each type of employee
@@ -249,6 +250,11 @@ bool valid_ssn(std::string str)
 void loginas_IQC_inspector()
 {
     display_IQCinsp_menu();
+}
+
+void loginas_technician()
+{
+    display_tech_menu();
 }
 
 void loginas_OQC_inspector()
@@ -266,10 +272,6 @@ void loginas_inv_associate()
     display_invassoc_menu();
 }
 
-void loginas_technician()
-{
-    display_tech_menu();
-}
 
 /* ------------------------------------------------------------------------
  * Menu viewing options for the various inspector types
@@ -290,9 +292,9 @@ void display_IQCinsp_menu()
         
         std::cout << "\t1. View Inventory\n";
         std::cout << "\t2. View IQC Inspections\n";
-        std::cout << "\t3. Add inspection\n";
+        std::cout << "\t3. Add IQC inspection\n";
         std::cout << "\t4. Approve IQC Inspection\n";
-        std::cout << "\t5. Send email for failed inspections\n";
+        std::cout << "\t5. Send email for failed IQC inspections\n";
         std::cout << "\t6. Logout\n";
     
         std::cin >> option;
@@ -315,7 +317,7 @@ void display_IQCinsp_menu()
                     break;
                     
                 case 3: //add new inspection
-                    add_new_inspections("Quality", "IQC Inspector");
+                    add_new_inspection("Quality", "IQC Inspector");
                     break;
                     
                 case 4: //approve inspection
@@ -323,7 +325,67 @@ void display_IQCinsp_menu()
                     break;
                     
                 case 5: //send email on failed inspection
-                    send_email("Quality", "IQC Inspector");
+                    send_email();
+                    break;
+                
+                case 6: //logout
+                    std::cout << "Goodbye!\n";
+                    goto exitwhileloop;
+            }
+            
+        }
+        
+    }
+    exitwhileloop:  ;
+    
+}
+
+/* ------------------------------------------------------------------------ */
+//Display menu options for technician
+void display_tech_menu()
+{
+   int option;
+    
+    while (true)
+    {
+        std::cout << "Choose an option below:\n";
+        
+        std::cout << "\t1. View Inventory\n";
+        std::cout << "\t2. View IPQC Inspections\n";
+        std::cout << "\t3. Add IPQC inspection\n";
+        std::cout << "\t4. Approve IPQC Inspection\n";
+        std::cout << "\t5. Send email for failed IPQC inspections\n";
+        std::cout << "\t6. Logout\n";
+    
+        std::cin >> option;
+        
+        if (option < 1 | option > 6)
+        {
+            std::cout << "Option is not valid. Please try again.\n";
+        }
+        else
+        {
+            //view, add, or approve the IPQC inspections
+            switch (option)
+            {
+                case 1: //view inventory
+                    view_all_inventory();
+                    break;
+                    
+                case 2: //view IPQC inspections list
+                    view_IPQC_inspections();
+                    break;
+                    
+                case 3: //add new inspection
+                    add_new_inspection("Operations", "Technician");
+                    break;
+                    
+                case 4: //approve inspection
+                    approve_inspection("Operations", "Technician");
+                    break;
+                    
+                case 5: //send email on failed inspection
+                    send_email();
                     break;
                 
                 case 6: //logout
@@ -353,7 +415,7 @@ void display_OQCinsp_menu()
         std::cout << "\t2. View OQC Inspections\n";
         std::cout << "\t3. Add OQC inspection\n";
         std::cout << "\t4. Approve OQC Inspection\n";
-        std::cout << "\t5. Send email for failed inspections\n";
+        std::cout << "\t5. Send email for failed OQC inspections\n";
         std::cout << "\t6. Logout\n";
     
         std::cin >> option;
@@ -371,12 +433,12 @@ void display_OQCinsp_menu()
                     view_all_inventory();
                     break;
                     
-                case 2: //view IQC inspections list
+                case 2: //view OQC inspections list
                     view_OQC_inspections();
                     break;
                     
                 case 3: //add new inspection
-                    add_new_inspections("Quality", "OQC Inspector");
+                    add_new_inspection("Quality", "OQC Inspector");
                     break;
                     
                 case 4: //approve inspection
@@ -384,7 +446,7 @@ void display_OQCinsp_menu()
                     break;
                     
                 case 5: //send email on failed inspection
-                    send_email("Quality", "OQC Inspector");
+                    send_email();
                     break;
                 
                 case 6: //logout
@@ -409,50 +471,56 @@ void display_QAdir_menu()
     while (true)
     {
         std::cout << "Choose an option below:\n";
-    
-        std::cout << "\t1. View inventory\n";
-        std::cout << "\t2. Add material information to inventory\n";
-        std::cout << "\t3. Add product information to inventory\n";
-        std::cout << "\t4. Create inspection requirement\n";
-        std::cout << "\t5. View Final Inspections\n";
-        std::cout << "\t6. Approve and certify final product\n";
-        std::cout << "\t7. Logout\n";
+        
+        std::cout << "\t1. View Inventory\n";
+        std::cout << "\t2. View FQC Inspections\n";
+        std::cout << "\t3. Add FQC inspection\n";
+        std::cout << "\t4. Approve FQC Inspection\n";
+        std::cout << "\t5. Send email for failed FQC inspections\n";
+        std::cout << "\t6. Add new part to inventory\n";
+        std::cout << "\t7. Create new part requirements\n";
+        std::cout << "\t8. Logout\n";
     
         std::cin >> option;
         
-        if (option < 1 | option > 7)
+        if (option < 1 | option > 8)
         {
             std::cout << "Option is not valid. Please try again.\n";
         }
         else
         {
-            //view or approve final inspections
+            //view, add, or approve the FQC inspections
             switch (option)
             {
-                case 1:
+                case 1: //view inventory
                     view_all_inventory();
                     break;
                     
-                case 2:
-                    add_material();
+                case 2: //view FQC inspections list
+                    view_FQC_inspections();
                     break;
                     
-                case 3:
-                    add_product();
+                case 3: //add new inspection
+                    add_new_inspection("Quality", "QA Director");
                     break;
                     
-                case 4:
+                case 4: //approve inspection
+                    approve_inspection("Quality", "QA Director");
+                    break;
+                    
+                case 5: //send email on failed inspection
+                    send_email();
+                    break;
+
+                case 6: //send new part information to inventory
+                    add_part();
+                    break;
+
+                case 7: //create new inspection requirements for part number
                     create_inspection_requirements();
                     break;
-                    
-                case 5:
-                    view_final_product_inspections();
-                    break;
-                    
-                case 6:
-                    approve_inspection("Quality", "QA director");
-                    break;
-                case 7:
+
+                case 8: //logout
                     std::cout << "Goodbye!\n";
                     goto exitwhileloop;
             }
@@ -483,7 +551,7 @@ void display_invassoc_menu()
     
         std::cin >> option;
         
-        if (option < 1 | option > 3)
+        if (option < 1 | option > 5)
         {
             std::cout << "Option is not valid. Please try again.\n";
         }
@@ -521,88 +589,43 @@ void display_invassoc_menu()
 
 /* ------------------------------------------------------------------------ */
 
-//Display menu options for technician
-void display_tech_menu()
-{
-    int option;
-    
-    while (true)
-    {
-        std::cout << "Choose an option below:\n";
-    
-        std::cout << "\t1. View Products in Progress\n";
-        std::cout << "\t2. View IPQC Inspection\n";
-        std::cout << "\t3. Create IPQC Inspection\n";
-        std::cout << "\t4. Approve IPQC Inspection\n";
-        std::cout << "\t5. Logout\n";
-    
-        std::cin >> option;
-        
-        if (option < 1 | option > 3)
-        {
-            std::cout << "Option is not valid. Please try again.\n";
-        }
-        else
-        {
-            //view products, perform and approve inspections
-            switch (option)
-            {
-                case 1:
-                    std::cout << "view_inventory();\n";
-                    break;
-                    
-                case 2:
-                    std::cout << "view_IPQC_list();\n";
-                    break;
-                
-                case 3:
-                    std::cout << "add_inspection();\n";
-                    break;
-                    
-                case 4:
-                    std::cout << "approve_inspection();\n";
-                    break;
-                    
-                case 5:
-                    std::cout << "Goodbye!\n";
-                    goto exitwhileloop;
-            }
-            
-        }
-        
-    }
-    exitwhileloop:  ;
-    
-}
-
-
+/* ------------------------------------------- VIEW MENU FUNCTIONS ----------------------------------------------------- */
 
 void view_all_inventory()
 {
-    std::cout << "Viewing all inventory...\n...\n...\n";
+    std::cout << "Viewing all inventory...\n...\n...\n"; //adding by brandon
 }
 
 void view_IQC_inspections()
 {
-    std::cout << "Running query view_inspections...\n";
+    std::cout << "Opening list of IQC inspections...\n";
     view_inspections("Quality", "IQC inspector");
-    //considering removing c++ func and adding sql func directly into switch-case
+    
+}
+
+void view_IPQC_inspections()
+{
+    std::cout << "Opening list of IPQC inspections...\n";
+    view_inspections("Operations", "Technician");
+    
 }
 
 void view_OQC_inspections()
 {
-    std::cout << "Running query view_inspections...\n";
+    std::cout << "Opening list of OQC inspections...\n";
     view_inspections("Quality", "OQC inspector");
-    //considering removing c++ func and adding sql func directly into switch-case
+    
 }
 
-void view_final_product_inspections()
+void view_FQC_inspections()
 {
-    std::cout << "Running query view_inspections...\n";
-    view_inspections("Quality", "OA Director");
-    //considering removing c++ func and adding sql func directly into switch-case
+    std::cout << "Opening list of FQC inspections...\n";
+    view_inspections("Quality", "Quality Director");
+    
 }
 
+
+/* ------------------------------------------- ADD MENU FUNCTIONS ----------------------------------------------------- */
 void add_new_inspections(std::string dept_name, std::string title)
 {
     int account, pn, insp_qty, insp_num;
@@ -611,169 +634,72 @@ void add_new_inspections(std::string dept_name, std::string title)
     std::string insp_area;
     
     //query to get next number for inspection
-    insp_num = get_next_insp_num();
+    insp_num = get_next_insp_num();   
     
-    //query to return the account that is currently logged in
-    account = get_account();
-    
-    switch (account)
-    {
-        case 1: case 2: // IQC Inspector
-            std::cout << "Enter the material part number: ";
-            break;
-            
-        case 3: case 4: // QA Director
-            std::cout << "Enter the product part number: ";
-            break;
-
-    }    
-    
+    //cin part_number
+    std::cout << "Enter the part number being inspected: ";
     std::cin >> pn;
     
-    //cin qty_inspected
+    //cin lot quantity
     std::cout << "Enter the total lot quantity: ";
     std::cin >> lot_qty;
     
     //query to pull sample_size for total quantity needed to pass
     sample_size = get_sample_size(insp_num);
     insp_qty = lot_qty * sample_size;
+
+    //set inspection area based on department and title
+    if (dept_name == "Quality")
+    {
+        if (title == "IQC Inspector") { insp_area = "IQC";   }
+
+        else if (title == "OQC Inspector") {   insp_area = "OQC";   }
+
+        else if (title == "QA Director") {   insp_area = "FQC";   }
+    }
+
+    else if (dept_name == "Operations")
+    {
+        if (title == "Technician") {   insp_area = "IPQC";   }
+    }
+
+    //create requirements for part number
+    bool add_more = true;
+    int option;
+    std::string requirement, res_type;
+
+    while (add_more)
+    {
+        std::cout << "Enter the inspection requirement: ";
+        std::cin >> requirement;
+
+        std::cout << "Enter the expected result type: ";
+        std::cin >> res_type;
+
+        create_requirements(pn, requirement, res_type);
+
+        std::cout << "Would you like to add another requirement?\n";
+        std::cout << "\t1. Yes\n";
+        std::cout << "\t2. No\n";
+
+        std::cin >> option;
+
+        if (option == 1)    {   continue;   }
+
+        else if (option == 2)   {   add_more = false;   }
+    }
+
     
     std::cout << "Adding inspection " << insp_num << " to inspections list...\n";
     add_inspection(insp_num, pn, insp_qty, insp_area);
+
     
     std::cout << "Inspection has been added to inspections list!";
     
 }
 
-void approve_inspection(std::string dept_name, std::string title)
+void add_part()
 {
-    int insp_num;
-    int qty_passed;
-    
-        //get today's date
-    time_t now = time(0);
-    char *date = ctime(&now);
-    
-    if (dept_name == "Quality")
-    {
-        if (title == "IQC Inspector")
-        {
-            std::cout << "Opening IQC Inspections...\n";
-            view_inspections(dept_name, title);
-        }
-        else if (title == "OQC Inspector")
-        {
-            std::cout << "Opening OQC Inspections...\n";
-            view_inspections(dept_name, title);
-        }
-        else if (title == "QA Director")
-        {
-            std::cout << "Opening Finished Product Inspections...\n";
-            view_inspections(dept_name, title);
-        }
-    }
-    else if (dept_name == "Manufacturing")
-    {
-        std::cout << "Opening In Process Inspections...\n";
-        view_inspections(dept_name);
-    }
-    
-    std::cout << "Choose an inspection part number to approve: ";
-    std::cin >> insp_num;
-    
-    //cout requirements and add cin for each
-    //      insp_res, qty_passed 
-    view_inspection_requirements(insp_num);
-    
-    //calculate to ensure all qty_passed == qty_inspected
-    qty_passed = calculate_fpy(insp_num);
-    
-    //query to get qty_inspected
-
-    if (qty_passed == get_qty_inspected(insp_num))
-    {
-        set_insp_pf("pass");
-        std::cout << "Lot Quantity Passed! Inspection " << insp_num << " Complete.\n";
-    }
-    else
-    {
-        set_insp_pf("fail");
-        std::cout << "Lot Quantity Failed. Sending email describing failed lot...\n";
-        send_email(insp_num);
-    }
-}
-
-void send_email(std::string dept_name, std::string title)
-{
-    
-}
-
-void send_email(int insp_num)
-{
-    
-}
-
-void add_material()
-{
-    int mat_num, supp_num;
-    std::string mat_desc, supp_name;
-    
-    //query to get next material number
-    mat_num = get_next_mat_num();
-    
-    std::cout << "Enter the new material description: ";
-    std::cin >> mat_desc;
-    
-    std::cout << "Enter the supplier name: ";
-    std::cin >> supp_name;
-    
-    std::cout << "Enter the supplier's part number: ";
-    std:: cin >> supp_num;
-    
-    //query to add information to Materials table
-    std::cout << "Adding material to inventory list...";
-    add_to_materials(mat_num, mat_desc, supp_name, supp_num);
-    std::cout << "Material added!\n";
-}
-
-void add_product()
-{
-    int prod_num, prod_desc, mat_num, mat_qty, choice;
-    std::string pn, qty;
-    std::string option;
-    bool add_more = true;
-    
-    //query to get next product number
-    prod_num = get_next_prod_num();
-    
-    std::cout << "Enter the new product description: ";
-    std::cin >> prod_desc;
-    
-    while (add_more)
-    {
-        
-        std::cout << "Enter the material number you would like to add to the product: ";
-        std::cin >> pn;
-        mat_num = std::stoi(pn);
-        
-        std::cout << "Enter the quantity for " << pn << ": ";
-        std::cin >> qty;
-        mat_qty = std::stoi(qty);
-        
-        
-        std::cout << "Would you like to add another item to this product?\n";
-        std::cout << "\t1. Yes\n";
-        std::cout << "\t2. No\n";
-        
-        std::cin >> option;
-        choice = std::stoi(option);
-        
-        if (choice == 2)
-        {
-            add_more = false;
-            std::cout << "Product added to inventory!";
-        }
-    }
     
 }
 
@@ -857,6 +783,74 @@ void create_inspection_requirements()
     
 }
 
+
+
+/* ------------------------------------------- APPROVE MENU FUNCTIONS ------------------------------------------------- */
+void approve_inspection(std::string dept_name, std::string title)
+{
+    int insp_num;
+    int fpy;
+    
+        //get today's date
+    time_t now = time(0);
+    char *date = ctime(&now);
+    
+    std::cout << "Choose an inspection part number to approve: ";
+    std::cin >> insp_num;
+    
+    //cout requirements and add cin for each
+    //      insp_res, qty_passed 
+    update_inspection_requirements(insp_num);
+    
+    //calculate to ensure all qty_passed == qty_inspected
+    fpy = calculate_fpy(insp_num);
+    
+    //query to get qty_inspected
+
+    if (fpy == 1)
+    {
+        set_insp_pf("pass");
+        std::cout << "Lot Quantity Passed! Inspection " << insp_num << " Complete.\n";
+    }
+    else
+    {
+        set_insp_pf("fail");
+        std::cout << "Lot Quantity Failed. Sending email describing failed lot...\n";
+        send_email(insp_num);
+    }
+}
+
+void send_email()
+{
+    int insp_num;
+
+    std::cout << "Enter the inspection number you would like to be sent out: ";
+    std::cin >> insp_num;
+
+    std::cout << "Writing email...\n";
+    std::cout << "Hello team!\n";
+    std::cout << "Below are the results of the failed inspection: \n";
+    
+    view_inspection_requirements(insp_num);
+
+    std::cout << "Please respond with the dispositions for all failing units. Thank you!\n";
+    std::cout << "Sending email...\n";
+
+}
+
+void send_email(int insp_num)
+{
+    std::cout << "Writing email...\n";
+    std::cout << "Hello team!\n";
+    std::cout << "Below are the results of the failed inspection: \n";
+    
+    view_inspection_requirements(insp_num);
+
+    std::cout << "Please respond with the dispositions for all failing units. Thank you!\n";
+    std::cout << "Sending email...\n";
+}
+
+/* -----------------------------------------INV ASSOC MENU FUNCTIONS -------------------------------------------------- */
 void receive_material()
 {
     
@@ -864,7 +858,9 @@ void receive_material()
 
 void pull_wo()
 {
-    
+    //view_BOM(pn);
+    //How many?
+
 }
 
 void backflush_product()

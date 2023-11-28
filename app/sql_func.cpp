@@ -539,7 +539,7 @@ bool approve_inspection(int insp_num, std::string insp_area)
 }
     
 
-/* -----------------------View inspections based on employee role-----------------------------*/
+/* ------------------------------------------- VIEW SQL FUNCTIONS ----------------------------------------------------- */
 void view_inspection(int insp_num, std::string emp_role)
 {
          //Create SQL Connection
@@ -576,14 +576,51 @@ void view_inspection(int insp_num, std::string emp_role)
     delete con;   
 }
 
-/* -----------------------------SQL QUERIES------------------------------ */
+void view_inspections(std::string dept_name, std::string title)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+    
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con -> prepareStatement("SELECT INSPECTIONS.Insp_num, INSPECTIONS.P_num, INSPECTIONS.Insp_date, INSPECTIONS.Emp_id, INSP_AREA.qty_inspected FROM INSPECTIONS INNER JOIN INSP_AREA ON INSPECTIONS.Insp_num = INSP_AREA.Insp_num AND INSP_AREA.insp_area = ?");
+    
+    if (dept_name == "Quality")
+    {
+        if (title == "IQC Inspector") { pstmt ->setString(1, "IQC");   }
+
+        else if (title == "OQC Inspector") {   pstmt ->setString(1, "OQC");   }
+
+        else if (title == "QA Director") {   pstmt ->setString(1, "FQC");   }
+    }
+
+    else if (dept_name == "Operations")
+    {
+        if (title == "Technician") {   pstmt ->setString(1, "IPQC");   }
+    }
+
+    while (res->next())
+    {
+        std::cout << "Inspection #: " << res->getInt(1) << " ";
+        std::cout << "Part Number: " << res->getInt(2) << " ";
+        std::cout << "Inspection Date: " << res->getString(3) << " ";
+        std::cout << "Performed By: " << res->getInt(4) << " ";
+        std::cout << "Quantity Inspected: " << res->getInt(5) << "\n";
+    }
+
+    delete con;
+    delete res;
+    delete pstmt;
+    
+}
 
 //SQL Queries to view various inspection lists
 
-void view_inspections(std::string dept_name)
-{
-    
-}
+
 
 
 void move_to_OQC(int pn)
@@ -642,20 +679,57 @@ int get_insp_num(int pnum)
 }
 
 
-void view_inspections(std::string dept_name, std::string title)
-{
-    
-}
-
 void view_inspection_requirements(int insp_num)
 {
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT (Insp_req, Insp_res, qty_passed) FROM INSP_REQ_RES WHERE INSP_REQ_RES.Insp_num = ?");
+    pstmt ->setInt(1, insp_num);
+    res = pstmt ->executeQuery();
+
+    while (res->next())
+    {
+        std::cout << "Requirement: " << res->getString(1);
+        std::cout << " Insp_res: " << res->getString(2);
+        std::cout << " Qty Passed: " << res->getInt(3);
+    }
+
+    delete con;
+    delete res;
+    delete pstmt;
     
 }
 
 //SQL Queries for Adding New Inspections
 int get_next_insp_num()
 {
-    return 0;
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::Statement *stmt;
+
+    int next_num;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    stmt = con->createStatement();
+    res = stmt->executeQuery("SELECT MAX(Insp_num)+1 FROM INSPECTIONS");
+
+    if (res->next())
+    {
+        next_num = res->getInt(1);
+    }
+    
+    return next_num;
 }
 
 int get_account()
@@ -663,34 +737,161 @@ int get_account()
     return 0;
 }
 
-int get_sample_size(int insp_num)
+double get_sample_size(int insp_num)
 {
-    return 0;
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    double sample_size;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT sample_size FROM Inspections WHERE Insp_pnum = ?");
+    pstmt -> setInt(1, insp_num);
+    res = pstmt->executeQuery();
+
+    if (res->next())
+    {
+        sample_size = res->getDouble(1);
+    }
+    
+    return sample_size;
 }
 
-void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area)
+void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area) // brandon
 {
     
 }
 
-//SQL Quesries for Approving Inspections
+//SQL Queries for Approving Inspections
+
+//SQL Query to get the quantity inspected from INSP_AREA
 int get_qty_inspected(int insp_num)
 {
-    return 0;
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    int qty_inspected;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT qty_inspected FROM INSP_AREA WHERE Insp_pnum = ?");
+    pstmt -> setInt(1, insp_num);
+    res = pstmt->executeQuery();
+
+    if (res->next())
+    {
+       qty_inspected = res->getInt(1);
+    }
+    
+    delete con;
+    delete pstmt;
+    delete res;
+
+    return qty_inspected;
 }
 
 int calculate_fpy(int insp_num)
 {
-    return 0;
-}
+    int qty_inspected = get_qty_inspected(insp_num);
 
-void set_insp_pf(std::string)
-{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    int num_req, qty_passed, i;
+    bool passed = false;
     
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT COUNT(*) FROM INSP_REQ_RES WHERE Insp_num = ?");
+    pstmt -> setInt(1, insp_num);
+    res = pstmt->executeQuery();
+
+    if (res->next())
+    {
+        num_req = res->getInt(1);
+    }
+
+    delete con;
+    delete res;
+    delete pstmt;
+
+    //for each requirement, verify the quantity that passed matches the qty to be inspected
+        //if the qty passed does not match the one inspected, set to fail, else pass
+
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    int total_req_passed = 0;
+    double fpy;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT qty_passed FROM INSP_REQ_RES WHERE Insp_num = ?");
+    pstmt -> setInt(1, insp_num);
+
+    while (res->next())
+    {
+        qty_passed = res->getInt(i);
+
+        if (qty_passed != qty_inspected)
+        {
+            set_insp_pf(insp_num, "fail");
+        }
+        else {  total_req_passed++; } 
+        i++;
+    }
+
+    fpy = total_req_passed / num_req;
+
+    delete con;
+    delete res;
+    delete pstmt;
+
+    return fpy;
 }
 
-//SQL Queries for Adding Material
-int get_next_mat_num()
+void set_insp_pf(int insp_num, bool pf)     // VERIFY IF THIS MATCHES 
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+    
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE INSPECTIONS SET pf = ? WHERE Insp_num = ?");
+    pstmt -> setBoolean(1, pf);
+    pstmt -> setInt(1, insp_num);
+    res = pstmt->executeQuery();
+
+    
+    delete con;
+    delete pstmt;
+    delete res;
+
+}
+
+//SQL Queries for Part Number
+int gegt_next_p_num()
 {
     return 0;
 }
@@ -698,12 +899,6 @@ int get_next_mat_num()
 void add_to_materials(int mat_num, std::string mat_desc, std::string supp_name, int supp_num)
 {
     
-}
-
-//SQL Queries for Adding Product
-int get_next_prod_num()
-{
-    return 0;
 }
 
 //SQL Queries for Creating Inspection Requirements
@@ -717,10 +912,174 @@ void create_requirements(int mat_prod_num, std::string requirement, std::string 
     
 }
 
+/* ------------------------- SQL Queries to move parts through INSP to FGI -------------------------- */
+void move_INSP_to_STORES(int p_num, int qty)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+    
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //subtract from original location and add to STORES
+    pstmt = con->prepareStatement("UPDATE PART_LOCATIONS SET INSP = INSP - ? AND STORES = STORES + ? WHERE P_num = ?");
+    pstmt -> setInt(1, qty);
+    pstmt -> setInt(2, qty);
+    pstmt -> setInt(3, p_num);
+    res = pstmt->executeQuery();
+
+    std::cout << qty << " of part number " << p_num << " has been moved from INSP into STORES.\n";
+
+    delete con;
+    delete pstmt;
+    delete res;
+}
+
+void move_STORES_to_WIP(int p_num, int qty)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+    
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //subtract from original location and add to WIP
+    pstmt = con->prepareStatement("UPDATE PART_LOCATIONS SET STORES = STORES - ? AND WIP = WIP + ? WHERE P_num = ?");
+    pstmt -> setInt(1, qty);
+    pstmt -> setInt(2, qty);
+    pstmt -> setInt(3, p_num);
+    res = pstmt->executeQuery();
+
+    std::cout << qty << " of part number " << p_num << " has been moved from STORES into WIP.\n";
+
+    delete con;
+    delete pstmt;
+    delete res;
+}
+
+void move_WIP_to_QC(int p_num, int qty)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+    
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //subtract from original location and add to QC
+    pstmt = con->prepareStatement("UPDATE PART_LOCATIONS SET WIP = WIP - ? AND QC = QC + ? WHERE P_num = ?");
+    pstmt -> setInt(1, qty);
+    pstmt -> setInt(2, qty);
+    pstmt -> setInt(3, p_num);
+    res = pstmt->executeQuery();
+
+    std::cout << qty << " of part number " << p_num << " has been moved from WIP into QC.\n";
+
+    delete con;
+    delete pstmt;
+    delete res;
+}
+
+void move_QC_to_FGI(int p_num, int qty)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+    
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //subtract from original location and add to FGI
+    pstmt = con->prepareStatement("UPDATE PART_LOCATIONS SET QC = QC - ? AND FGI = FGI + ? WHERE P_num = ?");
+    pstmt -> setInt(1, qty);
+    pstmt -> setInt(2, qty);
+    pstmt -> setInt(3, p_num);
+    res = pstmt->executeQuery();
+
+    std::cout << qty << " of part number " << p_num << " has been moved from QC into FGI.\n";
+
+    delete con;
+    delete pstmt;
+    delete res;
+}
+
+
+/* ------------------ Accessor and Modifier Functions --------------------------------- */
 
 
 
-//Sample state insertion
+//ACCESSORS AND MODIFIERS FOR SETTING INDIVIDUAL ATTRIBUTES
+void set_string_attribute(std::string table, std::string attr, std::string attr_value,
+                            std::string condition, std::string con_value)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+    pstmt->setString(1, table);
+    pstmt->setString(2, attr);
+    pstmt->setString(3, attr_value);
+    pstmt->setString(4, condition);
+    pstmt->setString(5, con_value);
+
+    res = pstmt->executeQuery();
+
+
+}
+
+void set_bool_attribute(std::string table, std::string attr, bool attr_value,
+                            std::string condition, bool con_value)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE ? SET ? = ? WHERE ? = ?");
+    pstmt->setString(1, table);
+    pstmt->setString(2, attr);
+    pstmt->setBoolean(3, attr_value);
+    pstmt->setString(4, condition);
+    pstmt->setBoolean(5, con_value);
+
+    res = pstmt->executeQuery();
+}
+
+void set_int_attribute(std::string table, std::string attr, std::string table_value, int attr_value)
+{
+
+}
+
+void set_double_attribute(std::string table, std::string attr, std::string table_value, double attr_value)
+{
+
+}
+
+
+
+
+/* -------------------------- Sample state insertion ---------------------------------- */
+
 void state_init()
 {
     sql::Driver *driver;
@@ -743,3 +1102,69 @@ void state_init()
     delete stmt;
     delete pstmt;
 }
+
+// MISC FUNCTIONS NO LONGER NEEDED
+// void add_material()
+// {
+//     int mat_num, supp_num;
+//     std::string mat_desc, supp_name;
+    
+//     //query to get next material number
+//     mat_num = get_next_mat_num();
+
+    
+//     std::cout << "Enter the new material description: ";
+//     std::cin >> mat_desc;
+    
+//     std::cout << "Enter the supplier name: ";
+//     std::cin >> supp_name;
+    
+//     std::cout << "Enter the supplier's part number: ";
+//     std:: cin >> supp_num;
+    
+//     //query to add information to Materials table
+//     std::cout << "Adding material to inventory list...";
+//     add_to_materials(mat_num, mat_desc, supp_name, supp_num);
+//     std::cout << "Material added!\n";
+// }
+
+// void add_product()
+// {
+//     int prod_num, prod_desc, mat_num, mat_qty, choice;
+//     std::string pn, qty;
+//     std::string option;
+//     bool add_more = true;
+    
+//     //query to get next product number
+//     prod_num = get_next_p_num();
+    
+//     std::cout << "Enter the new product description: ";
+//     std::cin >> prod_desc;
+    
+//     while (add_more)
+//     {
+        
+//         std::cout << "Enter the material number you would like to add to the product: ";
+//         std::cin >> pn;
+//         mat_num = std::stoi(pn);
+        
+//         std::cout << "Enter the quantity for " << pn << ": ";
+//         std::cin >> qty;
+//         mat_qty = std::stoi(qty);
+        
+        
+//         std::cout << "Would you like to add another item to this product?\n";
+//         std::cout << "\t1. Yes\n";
+//         std::cout << "\t2. No\n";
+        
+//         std::cin >> option;
+//         choice = std::stoi(option);
+        
+//         if (choice == 2)
+//         {
+//             add_more = false;
+//             std::cout << "Product added to inventory!";
+//         }
+//     }
+    
+// }
