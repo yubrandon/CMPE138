@@ -931,7 +931,7 @@ void approve_inspection(std::string dept_name, std::string title)
     
         //get today's date
     time_t now = time(0);
-    char *date = ctime(&now);
+    std::string time = ctime(&now);
     
     std::cout << "Choose an inspection number to approve: ";
     std::cin >> insp_num;
@@ -954,7 +954,7 @@ void approve_inspection(std::string dept_name, std::string title)
         std::cout << "How many items were passed? ";
         std::cin >> qty;
 
-        update_inspection_requirements(insp_num,req[i],result,qty);
+        update_inspection_requirements(insp_num,currUser->id,time,req[i],result,qty);
     }
 
 

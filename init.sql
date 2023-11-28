@@ -31,7 +31,8 @@ CREATE TABLE DEPARTMENT(
     Dnumber int,
     Dept_mgr char(9),  
     Dept_desc varchar(50),
-    CONSTRAINT DEPT_PK PRIMARY KEY (Dnumber)
+    CONSTRAINT DEPT_PK PRIMARY KEY (Dnumber),
+    CONSTRAINT DEPT_MGR_FK FOREIGN KEY (Dept_mgr) REFERENCES EMPLOYEE (ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE PART(
@@ -86,7 +87,7 @@ CREATE TABLE INSPECTIONS(
     Insp_pnum int,
     Emp_id int,
     Pass_fail boolean,
-    Insp_date DATE,
+    Insp_date varchar(30),
     CONSTRAINT INSP_PK PRIMARY KEY (Insp_num),
     CONSTRAINT INSP_FK FOREIGN KEY (Insp_pnum) REFERENCES PART (P_num) ON DELETE SET NULL ON UPDATE CASCADE
 );

@@ -611,7 +611,7 @@ void view_OQC_list()
     delete con;   
 }
 /* -----------------------Add inspection based on employee role-----------------------------*/
-void add_inspection(int pn, int insp_area, std::string requirements, std::string emp_role,
+/*void add_inspection(int pn, int insp_area, std::string requirements, std::string emp_role,
                                 int qty, std::string result, std::string insp_date)
 {
     sql::Driver *driver;
@@ -667,7 +667,7 @@ void add_inspection(int pn, int insp_area, std::string requirements, std::string
     delete res;
     delete pstmt;
     delete con;
-}
+}*/
 
 /* --------------------------------Approve inspection------------------------------------*/
 bool approve_inspection(int insp_num, std::string insp_area)
@@ -1005,10 +1005,16 @@ void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area) /
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("INSERT INTO INSPECTIONS VALUES(?,?)");
+    pstmt = con->prepareStatement("INSERT INTO INSPECTIONS VALUES(?,?,NULL,NULL,NULL)");
     pstmt->setInt(1,insp_num);
+    pstmt->setInt(2,pn);
     pstmt -> execute();
 
+    pstmt = con->prepareStatement("INSERT INTO INSP_AREA VALUES(?,?,?)");
+    pstmt->setInt(1,insp_num);
+    pstmt->setString(2,insp_area);
+    pstmt->setInt(3,insp_qty);
+    pstmt->execute();
 
     delete con;
     delete res;
@@ -1135,7 +1141,7 @@ void set_insp_pf(int insp_num, bool pf)     // VERIFY IF THIS MATCHES
 
 }
 
-void update_inspection_requirements(int insp_num, std::string insp_req, std::string insp_res, int qty_pass)
+void update_inspection_requirements(int insp_num, int id, std::string time, std::string insp_req, std::string insp_res, int qty_pass)
 {
     sql::Driver *driver;
     sql::Connection *con;
@@ -1144,6 +1150,12 @@ void update_inspection_requirements(int insp_num, std::string insp_req, std::str
     driver = get_driver_instance();
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("UPDATE INSPECTIONS SET Emp_id = ?, Insp_date = ? WHERE Insp_num = ?");
+    pstmt->setInt(1,id);
+    pstmt->setString(2,time);
+    pstmt->setInt(3,insp_num);
+    pstmt->executeUpdate();
 
     pstmt = con->prepareStatement("INSERT INTO INSP_REQ_RES VALUES (?,?,?,?)");
     pstmt->setInt(1,insp_num);
