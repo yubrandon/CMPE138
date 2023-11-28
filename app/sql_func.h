@@ -24,6 +24,7 @@
 void db_init();
 void state_init();
 bool user_exists(std::string user);     //return boolean indicating if username exists in db
+bool user_exists(int id);
 bool ssn_exists(std::string ssn);               //return boolean indicating if ssn exists in db
 void get_user(User *user);
 bool verify_user(std::string user, std::string pw);         //return boolean indicating if username and password input exist in a tuple
@@ -33,6 +34,13 @@ int get_emp_id(int ssn);
 //Supervisor/Department manager
 void assign_dept(int id,int dnum);      //assign department number for a new employee
 void assign_role(int id, std::string role);               //assign job_title for a new employee
+void view_unassigned_emp();
+void view_roleless_emp();
+void view_department(int dnum);
+bool dept_exists(int dnum);
+void view_dept();
+
+
 
 void create_dept(int dnum,std::string d_desc);  //add a new department tuple
 void edit_dept(int dnum, std::string d_desc);    //edit description for a department
@@ -115,6 +123,7 @@ int get_fgi_count(int pnum);
 //SQL Queries for PART_LISt
 void add_kit(int pr_num,std::vector<int>&mat_list,std::vector<int>&qty);            //add a part list for a product and its materials, reference material id and quantity through passed arrays
 int get_mat_quantity(int pr_num,int mat_num);
+bool kit_exists(int prnum);
 
 //SQL Queries for Creating Inspection Requirements
 void create_requirements(int pnum, std::string requirement, std::string insp_area,std::string res_type);

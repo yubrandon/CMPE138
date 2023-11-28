@@ -11,6 +11,7 @@ int OQC_SESSION_COUNT = 0;
 int QA_SESSION_COUNT = 0;
 int INV_ASSOC_SESSION_COUNT = 0;
 int TECH_SESSION_COUNT = 0;
+int ADMIN_SESSION_COUNT = 0;
 
 void user_test()
 {
@@ -122,6 +123,8 @@ void login()
     else if(job == "QA Director") loginas_QAdirector();
     else if(job == "Inventory Associate") loginas_inv_associate();
     else if(job == "Technician") loginas_technician();
+    else if(job == "Administrator") loginas_administrator();
+    else std::cout << "Employee Role not found. Please contact an administrator.\n";
 
     //user_test();
 
@@ -282,6 +285,10 @@ void loginas_inv_associate()
     display_invassoc_menu();
 }
 
+void loginas_administrator()
+{
+    display_admin_menu();
+}
 
 /* ------------------------------------------------------------------------
  * Menu viewing options for the various inspector types
@@ -923,6 +930,77 @@ void create_inspection_requirements()
     
 }
 
+void display_admin_menu()
+{
+   ADMIN_SESSION_COUNT++;
+    int option;
+    auto file_logger = spdlog::basic_logger_mt("User: " + currUser->username + " (ADMIN)" + "session_" + std::to_string(ADMIN_SESSION_COUNT),"../logfile.txt");
+    file_logger->info("start");
+    while (true)
+    {
+        std::cout << "Choose an option below:\n";
+    
+        std::cout << "\t1. View unassigned employees\n";
+        std::cout << "\t2. View roleless employees\n";
+        std::cout << "\t3. View department roster\n";
+        std::cout << "\t4. View departments\n";
+        std::cout << "\t5. Edit employee department\n";
+        std::cout << "\t6. Edit employee role\n";
+        std::cout << "\t7. Logout\n";
+    
+        std::cin >> option;
+        
+        if (option < 1 | option > 7)
+        {
+            std::cout << "Option is not valid. Please try again.\n";
+        }
+        else
+        {
+            switch (option)
+            {
+                case 1:
+                    file_logger->info("viewed unassigned employees");
+                    std::cout << "Displaying employees without a department:\n";
+                    view_unassigned_emp();
+                    break;
+                    
+                case 2:
+                    file_logger->info("viewed roleless employees");
+                    std::cout << "Displaying employees without a role:\n";
+                    view_roleless_emp();
+                    break;
+
+                case 3:
+                    file_logger->info("viewed department roster");
+                    view_department_menu();
+                    break;
+
+                case 4:
+                    file_logger->info("viewed departments");
+                    view_dept();
+                    break;
+                    
+                case 5:file_logger->info("edited employee department");
+                    file_logger->info("pulled work order");
+                    assign_dept_menu();
+                    break;
+                    
+                case 6:
+                    file_logger->info("edited employee role");
+                    assign_role_menu();
+                    break;
+                    
+                case 7: //logout
+                    std::cout << "Goodbye!\n";      
+                    goto exitwhileloop;
+            };
+            
+        }
+        
+    }
+    exitwhileloop:  ;
+    file_logger->info("end");
+}
 
 
 /* ------------------------------------------- APPROVE MENU FUNCTIONS ------------------------------------------------- */
@@ -1011,21 +1089,19 @@ void send_email(int insp_num)
 /* -----------------------------------------INV ASSOC MENU FUNCTIONS -------------------------------------------------- */
 void receive_part_menu()
 {
-    std::string pdesc;
-    std::cout << "Enter the name of the part that is being received: ";
-    std::cin >> pdesc;
+    int i;
+    std::cout << "Enter the ID of the part that is being received: ";
+    std::cin >> i;
 
 
 
-    while(!(part_exists(get_part_id(pdesc))))
+    while(!(part_exists(i)))
     {
-        std::cout << "That part does not exist in the system, please enter a new name, or 'exit' to return: ";
-        std::cin >> pdesc;
-        std::string exitcheck = tolowerstring(pdesc);
-        if(exitcheck == "exit")
+        std::cout << "That part does not exist in the system, please enter a new ID, or '0' to exit: ";
+        std::cin >> i;
+
+        if(i == 0)
         {
-            //Log exit event
-            //file_logger->info("exit at username input");
             std::cout << "Returning to main menu." << std::endl;
             return;
         }
@@ -1035,11 +1111,11 @@ void receive_part_menu()
     std::cout << "What is the quantity being received? ";
     std::cin >> qty;
 
-    int type = get_part_type(get_part_id(pdesc));
+    int type = get_part_type(i);
     switch(type)
     {
         case 0: 
-            receive_material(get_part_id(pdesc),qty);
+            receive_material(i,qty);
             std::cout << "Quantity of: " << qty << " successfully received! Returning to menu.";
             break;
 
@@ -1048,7 +1124,7 @@ void receive_part_menu()
             break;
 
         case 2:
-            receive_material_accessory(get_part_id(pdesc),qty);
+            receive_material_accessory(i,qty);
             std::cout << "Quantity of: " << qty << " successfully received! Returning to menu.";
             break;
 
@@ -1057,39 +1133,41 @@ void receive_part_menu()
 
 void pull_wo_menu()
 {
-    std::string name;
+    int n;
 
-    std::cout << "Enter the name of the product to see the BOM for: ";
-    std::cin >> name;
+    std::cout << "Enter the ID of the product to pull a work order for: ";
+    std::cin >> n;
 
-    while(!(part_exists(get_part_id(name))) && get_part_type(get_part_id(name)) != 1)
+    while(!(part_exists(n)) && get_part_type(n) != 1)
     {
-        std::cout << "Product not found. Please re-enter the name or type 'exit' to return: ";
-        std::cin >> name;
+        std::cout << "Product not found. Please re-enter the ID or type '0' to return: ";
+        std::cin >> n;
 
-        std::string exitcheck = tolowerstring(name);
-        if(exitcheck == "exit")
+    
+        if(n == 0)
         {
-            //Log exit event
-            //file_logger->info("exit at username input");
             std::cout << "Returning to main menu." << std::endl;
             return;
         }
     }
 
-    if(!part_loc_exists(get_part_id(name)))
+    if(!part_loc_exists(n))
     {
         std::cout << "ERROR: Part is not in storage. Returning to main menu.\n";
         return;
     }
-
-    std::vector<int>mats = get_bom_id(get_part_id(name));
+        if(!kit_exists(n))
+    {
+        std::cout << "Product does not have a kitting specification, please contact a technician.\nReturning to the main menu.\n";
+        return;
+    }
+    std::vector<int>mats = get_bom_id(n);
 
     for(int i = 0; i < mats.size(); i++)
     {
         if(!part_loc_exists(mats[i]))
         {
-            std::cout << "Material: " << tolowerstring(name) << " is not available in storage, returning to main menu.\n";
+            std::cout << "Material: " << get_part_name(n) << " is not available in storage, returning to main menu.\n";
             return;
         }
     }
@@ -1100,26 +1178,24 @@ void pull_wo_menu()
     
     for(int i = 0; i < mats.size(); i++)
     {
-        if((qty*get_mat_quantity(get_part_id(name),mats[i])) > get_stores_count(mats[i]))
+        if((qty*get_mat_quantity(n,mats[i])) > get_stores_count(mats[i]))
         {
+            //std::cout << "check: " << qty << " " << get_mat_quantity(n,mats[i]) << " " << get_stores_count(mats[i]) << std::endl;
             std::cout << "ERROR: Insufficient quantity of: " << tolowerstring(get_part_name(mats[i])) << " available in stores.\n";
-            std::string str;
-            std::cout << "Please re-enter a value or type 'exit' to return to the menu: ";
-            std::cin >> str;
-            if(str == "exit")
+            std::cout << "Please re-enter a value or type '0' to return to the menu: ";
+            std::cin >> qty;
+            if(qty == 0)
             {
                 //Log exit event
                 //file_logger->info("exit at username input");
                 std::cout << "Returning to main menu." << std::endl;
                 return;
             }
-            //add integer checking error handling
-            qty = std::stoi(str);
             goto getquant;
         }
     }
 
-    pull_wo(get_part_id(name),mats,qty);
+    pull_wo(n,mats,qty);
 
     std::cout << "\nOrder successfully placed! Returning to main menu." << std::endl;
 }
@@ -1140,26 +1216,35 @@ void backflush_product()
             return;
         }
     }
+    if(!kit_exists(id))
+    {
+        std::cout << "Product does not have a kitting specification, please contact a technician.\nReturning to the main menu.\n";
+        return;
+    }
     int product = id;
     std::vector<int>mats = get_bom_id(id);       //vector containing materials in order
     std::vector<int>count;                                      //vector containing the quantity for each material
     std::vector<int>max;        //vector containing maximum products that can be created with available material 
+    
     for(int i = 0; i < mats.size();i++)
     {
         int qty = get_wip_count(mats[i]);
+        //std::cout << "error" << std::endl;
         if(qty == 0)
         {
             std::cout<< "Quantity for material '" << get_part_name(mats[i]) << "' is 0. Unable to backflush this product. Returning to main menu.\n";
             return;
         }
+        //std::cout << "error" << qty << " " << get_parts_needed(product,mats[i]) << std::endl;
         count.push_back(qty);
-        int n = get_parts_needed(product,mats[i])/qty;
+        int n = static_cast<int>(qty/(get_parts_needed(product,mats[i])));
         if(n == 0)
         {
             std::cout << "Insufficient material available to backflush this product. Returning to the main menu.\n";
             return;
         }
-        max.push_back(get_parts_needed(product,mats[i])/qty);
+        //std::cout << "error" << std::endl;
+        max.push_back(n);
     }
 
     int min = *std::min_element(max.begin(), max.end());
@@ -1191,6 +1276,77 @@ void backflush_product()
     backflush_product(product,backflush);
     std::cout<<"Order completed. Returning to main menu.\n";
     return;
+}
+void view_department_menu()
+{
+    int i;
+    std::cout << "Enter the department number you would like to view: ";
+    std::cin >> i;
+    while(!dept_exists(i))
+    {
+        std::cout << "ERROR: That department does not exist, please enter a valid option, or type 0 to exit.\n";
+        std::cin >> i;
+        if(i == 0){ 
+            std::cout << "Returning to main menu...\n";
+            return;}
+    }
+    std::cout << "Displaying employees for department: " << i << std::endl;
+    view_department(i);
+}
+
+void assign_dept_menu()
+{
+    std::cout << "Enter the ID of the employee you would like to assign a department for: ";
+    int i;
+    std::cin >> i;
+    while(!user_exists(i))
+    {
+        std::cout << "ERROR: That user does not exist. Please enter a new ID, or enter 0 to exit.\n";
+        std::cin >> i;
+        if(i == 0)
+        {
+            std::cout << "Returning to main menu...\n";
+            return;
+        }
+    }
+    int d;
+    std::cout << "Enter the ID of the department you would like to assign to this employee.\n";
+    std::cin >> d;
+    while(!dept_exists(d))
+    {
+        std::cout << "ERROR: That department does not exist. Please enter a new value, or enter 0 to exit.\n";
+        std::cin >> d;
+        if(i == 0)
+        {
+            std::cout << "Returning to main menu...\n";
+            return;
+        }
+    }
+    assign_dept(i,d);
+    std::cout << "Successfully assigned!\n";
+    
+}
+void assign_role_menu()
+{
+    std::cout << "Enter the ID of the employee you would like to assign a role for: ";
+    int i;
+    std::cin >> i;
+    while(!user_exists(i))
+    {
+        std::cout << "ERROR: That user does not exist. Please enter a new ID, or enter 0 to exit.\n";
+        std::cin >> i;
+        if(i == 0)
+        {
+            std::cout << "Returning to main menu...\n";
+            return;
+        }
+    }
+    std::string role;
+    std::cout << "Enter the role that you would like to assign to this employee.\n";
+    std::cin >> role;
+
+    assign_role(i,role);
+    std::cout << "Successfully assigned!\n";
 }
 
 std::string tolowerstring(std::string str)

@@ -72,6 +72,32 @@ bool user_exists(std::string user)
         return valid;
 }
 
+bool user_exists(int id)
+{
+        sql::Driver *driver;
+        sql::Connection *con;
+        sql::ResultSet *res;
+        sql::PreparedStatement *pstmt;
+
+        driver = get_driver_instance();
+        con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+        con->setSchema("InventoryDB");
+
+        //Query DB to see if username input exists in DB
+        pstmt = con->prepareStatement("SELECT ID FROM employee WHERE ID = ?");
+        pstmt->setInt(1,id);
+        res = pstmt->executeQuery();
+
+        //Return if query result exists
+        bool valid = res -> next();
+
+        //delete res;
+        //delete pstmt;
+        //delete con;
+
+        return valid;
+}
+
 bool ssn_exists(std::string ssn)
 {
         //Create SQL Connection
@@ -301,6 +327,174 @@ void assign_role(int id, std::string role)
     //delete pstmt;
 }
 
+void view_unassigned_emp()
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res,*res2;
+    sql::Statement *stmt;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //prepare SQL statement
+    stmt = con->createStatement();
+    res = stmt->executeQuery("SELECT ID FROM EMPLOYEE_INFO WHERE Dno = NULL");
+    std::vector<int>ids;
+    std::vector<std::string>names;
+    while(res->next())
+    {
+        ids.push_back(res->getInt(1));
+        pstmt= con->prepareStatement("SELECT Lname, Fname FROM EMPLOYEE WHERE ID = ?");
+        pstmt -> setInt(1,res->getInt(1));
+        res2 = pstmt -> executeQuery();
+        names.push_back(res->getString(1) + ", " + res->getString(2));
+    }
+
+    while (res->next())
+    {
+        names.push_back(res->getString(1) + ", " + res->getString(2));
+    }
+    for(int i = 0; i < ids.size(); i++)
+    {
+        std::cout << "\tID: " << ids[i] << "\tName: " << names[i] << std::endl;
+    }
+    
+    //delete res;
+    //delete stmt;
+    //delete con;
+}
+void view_roleless_emp()
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res,*res2;
+    sql::Statement *stmt;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //prepare SQL statement
+    stmt = con->createStatement();
+    res = stmt->executeQuery("SELECT ID FROM EMPLOYEE_INFO WHERE Job_title = NULL");
+    std::vector<int>ids;
+    std::vector<std::string>names;
+    while(res->next())
+    {
+        ids.push_back(res->getInt(1));
+        pstmt= con->prepareStatement("SELECT Lname, Fname FROM EMPLOYEE WHERE ID = ?");
+        pstmt -> setInt(1,res->getInt(1));
+        res2 = pstmt -> executeQuery();
+        names.push_back(res->getString(1) + ", " + res->getString(2));
+    }
+
+    
+    for(int i = 0; i < ids.size(); i++)
+    {
+        std::cout << "\tID: " << ids[i] << "\tName: " << names[i] << std::endl;
+    }
+    
+    //delete res;
+    //delete stmt;
+    //delete con;
+}
+void view_department(int dnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res,*res2;
+    sql::PreparedStatement *pstmt,*pstmt2;
+        
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //prepare SQL statement
+    pstmt = con->prepareStatement("SELECT ID FROM EMPLOYEE_INFO WHERE Dno = ?");
+    pstmt ->setInt(1,dnum);
+    res = pstmt->executeQuery();
+
+    std::vector<int>ids;
+    std::vector<std::string>names;
+    while (res->next())
+    {
+        ids.push_back(res->getInt(1));
+    }
+    for(int i = 0; i < ids.size(); i++)
+    {
+        pstmt2 = con->prepareStatement("SELECT Lname, Fname FROM EMPLOYEE WHERE ID = ?");
+        pstmt2 -> setInt(1,ids[i]);
+        res2 = pstmt2->executeQuery();
+        if(res2 ->next())
+{        names.push_back(res2->getString(1) + ", " + res2->getString(2));
+}
+    }
+    for(int i = 0; i < ids.size(); i++)
+    {
+        std::cout << "\tID: " << ids[i] << "\tName: " << names[i] << std::endl;
+    }
+    
+    //delete res;
+    //delete stmt;
+}
+
+bool dept_exists(int dnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT Dnumber FROM DEPARTMENT WHERE Dnumber = ?");
+    pstmt->setInt(1,dnum);
+    res = pstmt->executeQuery();
+
+    bool exists = false;
+    if(res->next()) exists = true;
+
+    //delete con;
+    //delete res;
+    //delete pstmt;
+    return exists;
+}
+
+void view_dept()
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::Statement *stmt;
+        
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //prepare SQL statement
+    stmt = con->createStatement();
+    res = stmt -> executeQuery("SELECT Dnumber, Dept_desc FROM DEPARTMENT");
+    
+
+    while (res->next())
+    {
+       std::cout << "Department #: " << res -> getInt(1);
+       std::cout << "\tDescription: " << res->getString(2) << std::endl;
+    }
+    std::cout << std::endl;
+    
+    //delete res;
+    //delete stmt;
+    //delete con;
+}
+
+
 void create_dept(int dnum,std::string d_desc)
 {
     sql::Driver *driver;
@@ -405,9 +599,9 @@ void get_inventory(int pnum)
     std::cout << "Item type: ";
     switch (res->getInt(2))
     {
-        case 0: std::cout << "Material\n";
-        case 1: std::cout << "Product\n";
-        case 2: std::cout << "Accessory\n";
+        case 0: std::cout << "Material\n"; break;
+        case 1: std::cout << "Product\n"; break;
+        case 2: std::cout << "Accessory\n";  break;
     }
 
     pstmt = con->prepareStatement("SELECT Supp_num,Supp_name FROM PART_SUPPLIER WHERE P_num = ?");
@@ -468,8 +662,12 @@ void get_inventory_all()
     std::cout << "Would you like to inspect a specific part? (Y/N)\n";
     std::string sel;
     std::cin>>sel;
-
-    if(tolowerstring(sel) == "y" || tolowerstring(sel) == "n")
+    while(tolowerstring(sel) != "y" && tolowerstring(sel) != "n")
+    {
+        std::cout << "Invalid input. Please re-enter your choice: ";
+        std::cin>>sel;
+    }
+    if(tolowerstring(sel) == "y")
     {
         std::cout << "Select a part number to inspect: ";
         int n;
@@ -498,7 +696,32 @@ void get_inventory_all()
 
 /* -------------------------------------------------------------- */
 
-std::vector<int> get_bom_id(int pnum)
+bool kit_exists(int prnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT PPr_num FROM PART_LIST WHERE PPr_num = ?");
+    pstmt -> setInt(1,prnum);
+    res = pstmt -> executeQuery();
+
+    if(res->next()) return true;
+    return false;
+
+    //delete con;
+    //delete pstmt;
+    //delete res;
+
+}
+
+std::vector<int> get_bom_id(int prnum)
 {
     sql::Driver *driver;
     sql::Connection *con;
@@ -512,7 +735,7 @@ std::vector<int> get_bom_id(int pnum)
     con->setSchema("InventoryDB");
 
     pstmt = con->prepareStatement("SELECT PMat_num FROM PART_LIST WHERE PPr_num = ?");
-    pstmt -> setInt(1,pnum);
+    pstmt -> setInt(1,prnum);
     res = pstmt -> executeQuery();
 
     while(res->next())
@@ -540,7 +763,7 @@ std::vector<std::string> get_bom_desc(std::vector<int> &id_vec)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("SELECT P_desc FROM MATERIAL WHERE P_num = ?");
+    pstmt = con->prepareStatement("SELECT P_desc FROM PART WHERE P_num = ?");
     for(int i = 0; i < id_vec.size(); i++)
     {
         pstmt -> setInt(1,id_vec[i]);
@@ -574,12 +797,13 @@ void pull_wo(int prnum, std::vector<int> mat_ids, int qty)
         pstmt = con ->prepareStatement("SELECT Mat_qty FROM PART_LIST WHERE PPr_num = ?");
         pstmt->setInt(1,prnum);
         res = pstmt->executeQuery();
+        res->next();
         int mult = res->getInt(1);
 
         pstmt = con->prepareStatement("UPDATE PART_LOCATION SET WIP = WIP + ?, STORES = STORES - ? WHERE P_num = ?");
         pstmt->setInt(1,mult*qty);
         pstmt->setInt(2,mult*qty);
-        pstmt->setInt(3,prnum);
+        pstmt->setInt(3,mat_ids[i]);
         pstmt->executeUpdate();
     }
 
@@ -823,8 +1047,8 @@ void receive_material(int pn, int qty)
     driver = get_driver_instance();
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
-
-    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET INSP = INSP + ? WHERE P_num = ?");
+    //INSP -> STORES
+    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET STORES = STORES + ? WHERE P_num = ?");
     pstmt->setInt(1,qty);
     pstmt->setInt(2,pn);
     pstmt ->executeUpdate();
@@ -871,8 +1095,13 @@ void backflush_product(int pn,int qty)
         pstmt = con->prepareStatement("UPDATE PART_LOCATION SET WIP = WIP - ? AND FGI = FGI + ? WHERE P_num = ?");
         pstmt->setInt(1,qty * (res->getInt(2)));
         pstmt->setInt(2,qty * (res->getInt(2)));
-        pstmt->setInt(3,pn);
+        pstmt->setInt(3,res->getInt(1));
+        pstmt->executeUpdate();
     }
+        pstmt = con->prepareStatement("UPDATE PART_LOCATION SET FGI = FGI + ? WHERE P_num = ?");
+        pstmt->setInt(1,qty);
+        pstmt->setInt(2,pn);
+        pstmt->executeUpdate();
 
     //delete con;
     //delete res;
@@ -1397,7 +1626,7 @@ int get_part_id(std::string pname)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("SELECT P_desc FROM MAT_LOCATIONS WHERE Pr_desc = ?");
+    pstmt = con->prepareStatement("SELECT P_desc FROM PART WHERE P_desc = ?");
     pstmt->setString(1,pname);
     res = pstmt->executeQuery();
 
@@ -1526,9 +1755,8 @@ int get_parts_needed(int pnum,int mat_num)
     pstmt->setInt(1,pnum);
     pstmt->setInt(2,mat_num);
     res = pstmt->executeQuery();
-    res->next();
-
-    int qty = res->getInt(1);
+    int qty = 0;
+    if(res->next()) qty = res->getInt(1);
 
     //delete con;
     //delete res;
@@ -1651,7 +1879,8 @@ int get_stores_count(int pnum)
     pstmt->setInt(1,pnum);
     res = pstmt->executeQuery();
 
-    int count = res->getInt(1);
+    int count = 0;
+    if(res->next())count = res->getInt(1);
 
     //delete con;
     //delete res;
@@ -1673,8 +1902,9 @@ int get_wip_count(int pnum)
     pstmt = con->prepareStatement("SELECT WIP FROM PART_LOCATION WHERE P_num = ?");
     pstmt->setInt(1,pnum);
     res = pstmt->executeQuery();
-
-    int count = res->getInt(1);
+    
+    int count = 0;
+    if(res->next()) count = res->getInt(1);
 
     //delete con;
     //delete res;
@@ -1773,9 +2003,8 @@ int get_mat_quantity(int pr_num,int mat_num)
     pstmt -> setInt(1,mat_num);
     pstmt->setInt(2,pr_num);
     res = pstmt->executeQuery();
-    res->next();
-
-    int qty = res->getInt(1);
+    int qty = 0;
+    if(res->next()) qty = res->getInt(1);
 
     //delete con;
     //delete res;
@@ -1972,8 +2201,13 @@ void state_init()
     assign_dept(8, 3);
     assign_role(8, "Operations Manager");
 
+    create_user("123456789", "admin", sha256("admin"), "Min", "Addi");
+    assign_dept(9, 1);
+    assign_role(9, "Administrator");
+
     assign_dept_mgr(4,7);
     assign_dept_mgr(3,8);
+    assign_dept_mgr(1,9);
 
     //assign_emp_id();
     //get_emp_id("123456789");
