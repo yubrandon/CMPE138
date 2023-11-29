@@ -344,19 +344,14 @@ void view_unassigned_emp()
     res = stmt->executeQuery("SELECT ID FROM EMPLOYEE_INFO WHERE Dno = NULL");
     std::vector<int>ids;
     std::vector<std::string>names;
-    while(res->next())
+    for(int i = 0; i < ids.size();i++)
     {
-        ids.push_back(res->getInt(1));
         pstmt= con->prepareStatement("SELECT Lname, Fname FROM EMPLOYEE WHERE ID = ?");
-        pstmt -> setInt(1,res->getInt(1));
-        res2 = pstmt -> executeQuery();
-        names.push_back(res->getString(1) + ", " + res->getString(2));
+        pstmt -> setInt(1,ids[i]);
+        res = pstmt->executeQuery();
+        if(res->next()){names.push_back(res->getString(1) + ", " + res->getString(2));}
     }
 
-    while (res->next())
-    {
-        names.push_back(res->getString(1) + ", " + res->getString(2));
-    }
     for(int i = 0; i < ids.size(); i++)
     {
         std::cout << "\tID: " << ids[i] << "\tName: " << names[i] << std::endl;
@@ -1004,7 +999,7 @@ void view_inspections(std::string dept_name, std::string title)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con -> prepareStatement("SELECT INSPECTIONS.Insp_num, INSPECTIONS.Insp_pnum, INSPECTIONS.Insp_date, INSPECTIONS.Emp_id, INSP_AREA.Qty FROM INSPECTIONS INNER JOIN INSP_AREA ON INSPECTIONS.Insp_num = INSP_AREA.Insp_num AND INSP_AREA.insp_area = ?");
+    pstmt = con -> prepareStatement("SELECT INSPECTIONS.Insp_num, INSPECTIONS.Insp_pnum, INSPECTIONS.Insp_date, INSPECTIONS.Emp_id, INSP_AREA.Qty_inspected FROM INSPECTIONS INNER JOIN INSP_AREA ON INSPECTIONS.Insp_num = INSP_AREA.Insp_num AND INSP_AREA.insp_area = ?");
     
     if (dept_name == "Quality")
     {
@@ -1092,7 +1087,7 @@ void backflush_product(int pn,int qty)
     res = pstmt -> executeQuery(); 
     while(res->next())
     {
-        pstmt = con->prepareStatement("UPDATE PART_LOCATION SET WIP = WIP - ? AND FGI = FGI + ? WHERE P_num = ?");
+        pstmt = con->prepareStatement("UPDATE PART_LOCATION SET WIP = WIP - ?, FGI = FGI + ? WHERE P_num = ?");
         pstmt->setInt(1,qty * (res->getInt(2)));
         pstmt->setInt(2,qty * (res->getInt(2)));
         pstmt->setInt(3,res->getInt(1));
@@ -2166,7 +2161,6 @@ void state_init()
     create_dept(2, "Quality");
     create_dept(3, "Operations");
     create_dept(4, "Engineering");
-    //departments must be created first before assigning to employees
 
     //create departments
     create_user("123456789", "wdoe1", sha256("wdoe1"), "Doe", "Willie");

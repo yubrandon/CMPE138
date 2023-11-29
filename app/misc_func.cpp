@@ -940,17 +940,17 @@ void display_admin_menu()
     {
         std::cout << "Choose an option below:\n";
     
-        std::cout << "\t1. View unassigned employees\n";
-        std::cout << "\t2. View roleless employees\n";
-        std::cout << "\t3. View department roster\n";
-        std::cout << "\t4. View departments\n";
-        std::cout << "\t5. Edit employee department\n";
-        std::cout << "\t6. Edit employee role\n";
-        std::cout << "\t7. Logout\n";
+        //std::cout << "\t1. View unassigned employees\n";
+        //std::cout << "\t2. View roleless employees\n";
+        std::cout << "\t1. View department roster\n";
+        std::cout << "\t2. View departments\n";
+        std::cout << "\t3. Edit employee department\n";
+        std::cout << "\t4. Edit employee role\n";
+        std::cout << "\t5. Logout\n";
     
         std::cin >> option;
         
-        if (option < 1 | option > 7)
+        if (option < 1 | option > 5)
         {
             std::cout << "Option is not valid. Please try again.\n";
         }
@@ -958,39 +958,39 @@ void display_admin_menu()
         {
             switch (option)
             {
-                case 1:
+                case 999:
                     file_logger->info("viewed unassigned employees");
                     std::cout << "Displaying employees without a department:\n";
                     view_unassigned_emp();
                     break;
                     
-                case 2:
+                case 9999:
                     file_logger->info("viewed roleless employees");
                     std::cout << "Displaying employees without a role:\n";
                     view_roleless_emp();
                     break;
 
-                case 3:
+                case 1:
                     file_logger->info("viewed department roster");
                     view_department_menu();
                     break;
 
-                case 4:
+                case 2:
                     file_logger->info("viewed departments");
                     view_dept();
                     break;
                     
-                case 5:file_logger->info("edited employee department");
+                case 3:file_logger->info("edited employee department");
                     file_logger->info("pulled work order");
                     assign_dept_menu();
                     break;
                     
-                case 6:
+                case 4:
                     file_logger->info("edited employee role");
                     assign_role_menu();
                     break;
                     
-                case 7: //logout
+                case 5: //logout
                     std::cout << "Goodbye!\n";      
                     goto exitwhileloop;
             };
@@ -1343,8 +1343,8 @@ void assign_role_menu()
     }
     std::string role;
     std::cout << "Enter the role that you would like to assign to this employee.\n";
-    std::cin >> role;
-
+    std::cin.ignore();
+    std::getline(std::cin,role);
     assign_role(i,role);
     std::cout << "Successfully assigned!\n";
 }
