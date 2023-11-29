@@ -41,8 +41,8 @@ void db_init()
         }
     }
     //Free storage
-    delete stmt;
-    delete con;
+    //delete stmt;
+    //delete con;
 }
 
 bool user_exists(std::string user)
@@ -65,9 +65,35 @@ bool user_exists(std::string user)
         //Return if query result exists
         bool valid = res -> next();
 
-        delete res;
-        delete pstmt;
-        delete con;
+        //delete res;
+        //delete pstmt;
+        //delete con;
+
+        return valid;
+}
+
+bool user_exists(int id)
+{
+        sql::Driver *driver;
+        sql::Connection *con;
+        sql::ResultSet *res;
+        sql::PreparedStatement *pstmt;
+
+        driver = get_driver_instance();
+        con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+        con->setSchema("InventoryDB");
+
+        //Query DB to see if username input exists in DB
+        pstmt = con->prepareStatement("SELECT ID FROM employee WHERE ID = ?");
+        pstmt->setInt(1,id);
+        res = pstmt->executeQuery();
+
+        //Return if query result exists
+        bool valid = res -> next();
+
+        //delete res;
+        //delete pstmt;
+        //delete con;
 
         return valid;
 }
@@ -92,15 +118,15 @@ bool ssn_exists(std::string ssn)
         //If query result exists, return true - ssn is already registered in database
         if(res -> next())
         {
-            delete res;
-            delete pstmt;
-            delete con;
+            //delete res;
+            //delete pstmt;
+            //delete con;
             return true;
         }
         //Else return false
-        delete res;
-        delete pstmt;
-        delete con;
+        //delete res;
+        //delete pstmt;
+        //delete con;
         return false;
 
     /*} catch (sql::SQLException &e) {
@@ -134,9 +160,9 @@ bool verify_user(std::string user, std::string pw)
     bool isValid = res->next();
 
     //Else return false
-    delete pstmt;
-    delete res;
-    delete con;
+    //delete pstmt;
+    //delete res;
+    //delete con;
     return isValid;
 }
 
@@ -170,8 +196,12 @@ void create_user(std::string ssn, std::string user, std::string pw, std::string 
 
     pstmt -> execute();
 
-    delete pstmt;
-    delete con;
+    pstmt = con->prepareStatement("INSERT INTO EMPLOYEE_INFO VALUES(?,NULL,NULL)");
+    pstmt->setInt(1,id);
+    pstmt->execute();
+
+    //delete pstmt;
+    //delete con;
 }
 
 void get_user(User *user)
@@ -193,7 +223,6 @@ void get_user(User *user)
     res -> next();
     user->id = res->getInt(1);
 
-    int emp_id = res->getInt(1);
 
     //Retrieve user's ssn
     pstmt = con->prepareStatement("SELECT SSN FROM EMPLOYEE WHERE Username = ?");
@@ -218,21 +247,21 @@ void get_user(User *user)
 
     //Retrieve user's department number
     pstmt = con->prepareStatement("SELECT Dno FROM EMPLOYEE_INFO WHERE ID = ?");
-    pstmt -> setInt(1,emp_id);
+    pstmt -> setInt(1,user->id);
     res = pstmt -> executeQuery();
     res -> next();
     user->dno = res->getInt(1);
 
     //Retrieve user's job title
     pstmt = con->prepareStatement("SELECT job_title FROM EMPLOYEE_INFO WHERE ID = ?");
-    pstmt -> setInt(1,emp_id);
+    pstmt -> setInt(1,user->id);
     res = pstmt -> executeQuery();
     res -> next();
     user->job_title = res->getString(1);
 
-    delete pstmt;
-    delete con;
-    delete res;
+    //delete pstmt;
+    //delete con;
+    //delete res;
 }
 
 
@@ -252,9 +281,9 @@ int get_emp_id(int ssn)
     res = pstmt -> executeQuery();
     int id = res->getInt(1);
 
-    delete con;
-    delete pstmt;
-    delete res;
+    //delete con;
+    //delete pstmt;
+    //delete res;
 
     return id;
 }
@@ -276,8 +305,8 @@ void assign_dept(int id,int dnum)
     pstmt -> setInt(2,id);
     pstmt -> executeUpdate();
 
-    delete con;
-    delete pstmt;
+    //delete con;
+    //delete pstmt;
 }
 void assign_role(int id, std::string role)
 {
@@ -294,9 +323,172 @@ void assign_role(int id, std::string role)
     pstmt -> setInt(2,id);
     pstmt -> executeUpdate();
 
-    delete con;
-    delete pstmt;
+    //delete con;
+    //delete pstmt;
 }
+
+void view_unassigned_emp()
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res,*res2;
+    sql::Statement *stmt;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //prepare SQL statement
+    stmt = con->createStatement();
+    res = stmt->executeQuery("SELECT ID FROM EMPLOYEE_INFO WHERE Dno = NULL");
+    std::vector<int>ids;
+    std::vector<std::string>names;
+    for(int i = 0; i < ids.size();i++)
+    {
+        pstmt= con->prepareStatement("SELECT Lname, Fname FROM EMPLOYEE WHERE ID = ?");
+        pstmt -> setInt(1,ids[i]);
+        res = pstmt->executeQuery();
+        if(res->next()){names.push_back(res->getString(1) + ", " + res->getString(2));}
+    }
+
+    for(int i = 0; i < ids.size(); i++)
+    {
+        std::cout << "\tID: " << ids[i] << "\tName: " << names[i] << std::endl;
+    }
+    
+    //delete res;
+    //delete stmt;
+    //delete con;
+}
+void view_roleless_emp()
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res,*res2;
+    sql::Statement *stmt;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //prepare SQL statement
+    stmt = con->createStatement();
+    res = stmt->executeQuery("SELECT ID FROM EMPLOYEE_INFO WHERE Job_title = NULL");
+    std::vector<int>ids;
+    std::vector<std::string>names;
+    while(res->next())
+    {
+        ids.push_back(res->getInt(1));
+        pstmt= con->prepareStatement("SELECT Lname, Fname FROM EMPLOYEE WHERE ID = ?");
+        pstmt -> setInt(1,res->getInt(1));
+        res2 = pstmt -> executeQuery();
+        names.push_back(res->getString(1) + ", " + res->getString(2));
+    }
+
+    
+    for(int i = 0; i < ids.size(); i++)
+    {
+        std::cout << "\tID: " << ids[i] << "\tName: " << names[i] << std::endl;
+    }
+    
+    //delete res;
+    //delete stmt;
+    //delete con;
+}
+void view_department(int dnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res,*res2;
+    sql::PreparedStatement *pstmt,*pstmt2;
+        
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //prepare SQL statement
+    pstmt = con->prepareStatement("SELECT ID FROM EMPLOYEE_INFO WHERE Dno = ?");
+    pstmt ->setInt(1,dnum);
+    res = pstmt->executeQuery();
+
+    std::vector<int>ids;
+    std::vector<std::string>names;
+    while (res->next())
+    {
+        ids.push_back(res->getInt(1));
+    }
+    for(int i = 0; i < ids.size(); i++)
+    {
+        pstmt2 = con->prepareStatement("SELECT Lname, Fname FROM EMPLOYEE WHERE ID = ?");
+        pstmt2 -> setInt(1,ids[i]);
+        res2 = pstmt2->executeQuery();
+        if(res2 ->next())
+{        names.push_back(res2->getString(1) + ", " + res2->getString(2));
+}
+    }
+    for(int i = 0; i < ids.size(); i++)
+    {
+        std::cout << "\tID: " << ids[i] << "\tName: " << names[i] << std::endl;
+    }
+    
+    //delete res;
+    //delete stmt;
+}
+
+bool dept_exists(int dnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT Dnumber FROM DEPARTMENT WHERE Dnumber = ?");
+    pstmt->setInt(1,dnum);
+    res = pstmt->executeQuery();
+
+    bool exists = false;
+    if(res->next()) exists = true;
+
+    //delete con;
+    //delete res;
+    //delete pstmt;
+    return exists;
+}
+
+void view_dept()
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::Statement *stmt;
+        
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    //prepare SQL statement
+    stmt = con->createStatement();
+    res = stmt -> executeQuery("SELECT Dnumber, Dept_desc FROM DEPARTMENT");
+    
+
+    while (res->next())
+    {
+       std::cout << "Department #: " << res -> getInt(1);
+       std::cout << "\tDescription: " << res->getString(2) << std::endl;
+    }
+    std::cout << std::endl;
+    
+    //delete res;
+    //delete stmt;
+    //delete con;
+}
+
 
 void create_dept(int dnum,std::string d_desc)
 {
@@ -313,8 +505,8 @@ void create_dept(int dnum,std::string d_desc)
     pstmt -> setString(2,d_desc);
     pstmt -> execute();
 
-    delete con;
-    delete pstmt;
+    //delete con;
+    //delete pstmt;
 }
 void edit_dept(int dnum, std::string d_desc)
 {
@@ -331,8 +523,8 @@ void edit_dept(int dnum, std::string d_desc)
     pstmt -> setInt(2,dnum);
     pstmt -> executeUpdate();
 
-    delete con;
-    delete pstmt;
+    //delete con;
+    //delete pstmt;
 }
 
 void assign_dept_mgr(int dnum, int id)
@@ -350,8 +542,8 @@ void assign_dept_mgr(int dnum, int id)
     pstmt -> setInt(2,dnum);
     pstmt -> executeUpdate();
 
-    delete con;
-    delete pstmt;
+    //delete con;
+    //delete pstmt;
 }
 
 std::vector<int> get_supervisee(std::string ssn)
@@ -376,9 +568,9 @@ std::vector<int> get_supervisee(std::string ssn)
         supervisee.push_back(res->getInt(1));
     }
 
-    delete con;
-    delete pstmt;
-    delete res;
+    //delete con;
+    //delete pstmt;
+    //delete res;
 
     return supervisee;
 }
@@ -402,20 +594,26 @@ void get_inventory(int pnum)
     std::cout << "Item type: ";
     switch (res->getInt(2))
     {
-        case 0: std::cout << "Material\n";
-        case 1: std::cout << "Product\n";
-        case 2: std::cout << "Accessory\n";
+        case 0: std::cout << "Material\n"; break;
+        case 1: std::cout << "Product\n"; break;
+        case 2: std::cout << "Accessory\n";  break;
     }
 
-    pstmt = con->prepareStatement("SELECT Supp_num,Supp_name FROM PART_SUPPLIER WHERE Part_num = ?");
+    pstmt = con->prepareStatement("SELECT Supp_num,Supp_name FROM PART_SUPPLIER WHERE P_num = ?");
     pstmt -> setInt(1,pnum);
     res = pstmt->executeQuery();
-    res -> next();
+    if(res -> next())
+    {   
+        std::cout << "Supplier number: " << res->getInt(1) << std::endl;
+        std::cout << "Supplier name: " << res-> getString(2) << std::endl;
+    }
+    else
+    {
+        std::cout << "Supplier number: N/A" << std::endl;
+        std::cout << "Supplier name: N/A" << std::endl;
+    }
 
-    std::cout << "Supplier number: " << res->getInt(1) << std::endl;
-    std::cout << "Supplier name: " << res-> getString(2) << std::endl;
-
-    pstmt = con->prepareStatement("SELECT INSP,STORES,WIP,QC,FGI FROM PART_LOCATIONS WHERE P_num = ?");
+    pstmt = con->prepareStatement("SELECT INSP,STORES,WIP,QC,FGI FROM PART_LOCATION WHERE P_num = ?");
     pstmt -> setInt(1,pnum);
     res = pstmt->executeQuery();
     res -> next();
@@ -427,9 +625,9 @@ void get_inventory(int pnum)
     std::cout << "\tQC: " << res->getInt(4) << std::endl;
     std::cout << "\tFGI: " << res->getInt(5) << std::endl;
 
-    delete con;
-    delete pstmt;
-    delete res;
+    //delete con;
+    //delete pstmt;
+    //delete res;
 }
 
 void get_inventory_all()
@@ -451,20 +649,74 @@ void get_inventory_all()
     {
         pnum.push_back(res->getInt(1));
     }
-    for(int i = 0;i < pnum.size();i++)
+    for(int i = 0; i < pnum.size(); i++)
     {
-        get_inventory(pnum[i]);
+        std::cout << "Part #: " << pnum[i];
+        std::cout << "\tPart Description: " << get_part_name(pnum[i]) << std::endl;
+    }
+    std::cout << "Would you like to inspect a specific part? (Y/N)\n";
+    std::string sel;
+    std::cin>>sel;
+    while(tolowerstring(sel) != "y" && tolowerstring(sel) != "n")
+    {
+        std::cout << "Invalid input. Please re-enter your choice: ";
+        std::cin>>sel;
+    }
+    if(tolowerstring(sel) == "y")
+    {
+        std::cout << "Select a part number to inspect: ";
+        int n;
+        std::cin >> n;
+        if(part_exists(n))
+        {
+            get_inventory(n);
+        }
+        else
+        {
+            std::cout << "Invalid part. Returning to menu.\n";
+            return;
+        }
+    }
+    else
+    {
+        std::cout << "Returning to main menu.\n";
+        return;
     }
 
-
-    delete con;
-    delete pstmt;
-    delete res;
+    ////delete stmt;
+    ////delete con;
+    ////delete pstmt;
+    ////delete res;
 }
 
 /* -------------------------------------------------------------- */
 
-std::vector<int> get_bom_id(int pnum)
+bool kit_exists(int prnum)
+{
+    sql::Driver *driver;
+    sql::Connection *con;
+    sql::ResultSet *res;
+    sql::PreparedStatement *pstmt;
+
+
+    driver = get_driver_instance();
+    con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
+    con->setSchema("InventoryDB");
+
+    pstmt = con->prepareStatement("SELECT PPr_num FROM PART_LIST WHERE PPr_num = ?");
+    pstmt -> setInt(1,prnum);
+    res = pstmt -> executeQuery();
+
+    if(res->next()) return true;
+    return false;
+
+    //delete con;
+    //delete pstmt;
+    //delete res;
+
+}
+
+std::vector<int> get_bom_id(int prnum)
 {
     sql::Driver *driver;
     sql::Connection *con;
@@ -478,7 +730,7 @@ std::vector<int> get_bom_id(int pnum)
     con->setSchema("InventoryDB");
 
     pstmt = con->prepareStatement("SELECT PMat_num FROM PART_LIST WHERE PPr_num = ?");
-    pstmt -> setInt(1,pnum);
+    pstmt -> setInt(1,prnum);
     res = pstmt -> executeQuery();
 
     while(res->next())
@@ -486,9 +738,9 @@ std::vector<int> get_bom_id(int pnum)
         mat_id.push_back(res->getInt(1));
     }
 
-    delete con;
-    delete pstmt;
-    delete res;
+    //delete con;
+    //delete pstmt;
+    //delete res;
 
     return mat_id;
 }
@@ -506,7 +758,7 @@ std::vector<std::string> get_bom_desc(std::vector<int> &id_vec)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("SELECT P_desc FROM MATERIAL WHERE P_num = ?");
+    pstmt = con->prepareStatement("SELECT P_desc FROM PART WHERE P_num = ?");
     for(int i = 0; i < id_vec.size(); i++)
     {
         pstmt -> setInt(1,id_vec[i]);
@@ -514,9 +766,9 @@ std::vector<std::string> get_bom_desc(std::vector<int> &id_vec)
         mat_desc.push_back(res -> getString(1));
     }
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 
     return mat_desc;
 
@@ -540,18 +792,19 @@ void pull_wo(int prnum, std::vector<int> mat_ids, int qty)
         pstmt = con ->prepareStatement("SELECT Mat_qty FROM PART_LIST WHERE PPr_num = ?");
         pstmt->setInt(1,prnum);
         res = pstmt->executeQuery();
+        res->next();
         int mult = res->getInt(1);
 
-        pstmt = con->prepareStatement("UPDATE PART_LOCATIONS SET WIP = WIP + ?, STORES = STORES - ? WHERE P_num = ?");
+        pstmt = con->prepareStatement("UPDATE PART_LOCATION SET WIP = WIP + ?, STORES = STORES - ? WHERE P_num = ?");
         pstmt->setInt(1,mult*qty);
         pstmt->setInt(2,mult*qty);
-        pstmt->setInt(3,prnum);
+        pstmt->setInt(3,mat_ids[i]);
         pstmt->executeUpdate();
     }
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 /* --------------------------------------------------------------------------------------- */
@@ -580,9 +833,9 @@ void view_IQC_list()
         std::cout << res->getString(1);
     }
     
-    delete res;
-    delete stmt;
-    delete con;
+    //delete res;
+    //delete stmt;
+    //delete con;
 }
     
 void view_OQC_list()
@@ -606,9 +859,9 @@ void view_OQC_list()
         std::cout << res->getString(1);
     }
     
-    delete res;
-    delete stmt;
-    delete con;   
+    //delete res;
+    //delete stmt;
+    //delete con;   
 }
 /* -----------------------Add inspection based on employee role-----------------------------*/
 /*void add_inspection(int pn, int insp_area, std::string requirements, std::string emp_role,
@@ -634,8 +887,8 @@ void view_OQC_list()
     while (res->next())
     {
         max_insp_num = res->getInt(1);
-        delete res;
-        delete con;
+        //delete res;
+        //delete con;
     }
         
     //prepare SQL statement to add new inspection
@@ -664,9 +917,9 @@ void view_OQC_list()
     
     pstmt->execute();
 
-    delete res;
-    delete pstmt;
-    delete con;
+    //delete res;
+    //delete pstmt;
+    //delete con;
 }*/
 
 /* --------------------------------Approve inspection------------------------------------*/
@@ -692,9 +945,9 @@ bool approve_inspection(int insp_num, std::string insp_area)
 
     //move material to next insp_area based on current insp_area
     
-    delete res;
-    delete pstmt;
-    delete con;
+    //delete res;
+    //delete pstmt;
+    //delete con;
 }
     
 
@@ -730,9 +983,9 @@ void view_inspection(int insp_num, std::string emp_role)
     
     
     
-    delete res;
-    delete pstmt;
-    delete con;   
+    //delete res;
+    //delete pstmt;
+    //delete con;   
 }
 
 void view_inspections(std::string dept_name, std::string title)
@@ -746,7 +999,7 @@ void view_inspections(std::string dept_name, std::string title)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con -> prepareStatement("SELECT INSPECTIONS.Insp_num, INSPECTIONS.P_num, INSPECTIONS.Insp_date, INSPECTIONS.Emp_id, INSP_AREA.qty_inspected FROM INSPECTIONS INNER JOIN INSP_AREA ON INSPECTIONS.Insp_num = INSP_AREA.Insp_num AND INSP_AREA.insp_area = ?");
+    pstmt = con -> prepareStatement("SELECT INSPECTIONS.Insp_num, INSPECTIONS.Insp_pnum, INSPECTIONS.Insp_date, INSPECTIONS.Emp_id, INSP_AREA.Qty_inspected FROM INSPECTIONS INNER JOIN INSP_AREA ON INSPECTIONS.Insp_num = INSP_AREA.Insp_num AND INSP_AREA.insp_area = ?");
     
     if (dept_name == "Quality")
     {
@@ -761,7 +1014,7 @@ void view_inspections(std::string dept_name, std::string title)
     {
         if (title == "Technician") {   pstmt ->setString(1, "IPQC");   }
     }
-
+    res = pstmt->executeQuery();
     while (res->next())
     {
         std::cout << "Inspection #: " << res->getInt(1) << " ";
@@ -771,9 +1024,9 @@ void view_inspections(std::string dept_name, std::string title)
         std::cout << "Quantity Inspected: " << res->getInt(5) << "\n";
     }
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
     
 }
 
@@ -789,15 +1042,15 @@ void receive_material(int pn, int qty)
     driver = get_driver_instance();
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
-
-    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET INSP = INSP + ? WHERE P_num = ?");
+    //INSP -> STORES
+    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET STORES = STORES + ? WHERE P_num = ?");
     pstmt->setInt(1,qty);
     pstmt->setInt(2,pn);
     pstmt ->executeUpdate();
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 void receive_material_accessory(int pn, int qty)
@@ -815,8 +1068,8 @@ void receive_material_accessory(int pn, int qty)
     pstmt->setInt(2,pn);
     pstmt ->executeUpdate();
 
-    delete con;
-    delete pstmt;
+    //delete con;
+    //delete pstmt;
 }
 void backflush_product(int pn,int qty)
 {
@@ -834,15 +1087,20 @@ void backflush_product(int pn,int qty)
     res = pstmt -> executeQuery(); 
     while(res->next())
     {
-        pstmt = con->prepareStatement("UPDATE PART_LOCATION SET WIP = WIP - ? AND FGI = FGI + ? WHERE P_num = ?");
+        pstmt = con->prepareStatement("UPDATE PART_LOCATION SET WIP = WIP - ?, FGI = FGI + ? WHERE P_num = ?");
         pstmt->setInt(1,qty * (res->getInt(2)));
         pstmt->setInt(2,qty * (res->getInt(2)));
-        pstmt->setInt(3,pn);
+        pstmt->setInt(3,res->getInt(1));
+        pstmt->executeUpdate();
     }
+        pstmt = con->prepareStatement("UPDATE PART_LOCATION SET FGI = FGI + ? WHERE P_num = ?");
+        pstmt->setInt(1,qty);
+        pstmt->setInt(2,pn);
+        pstmt->executeUpdate();
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 void move_to_OQC(int pn)
@@ -868,9 +1126,9 @@ void move_to_OQC(int pn)
     pstmt->setInt(3,pn);
     pstmt ->executeUpdate();
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 
 }
 
@@ -894,9 +1152,9 @@ int get_insp_num(int pnum)
     int i = 0;
     if(res->next())
         i = res->getInt(1);
-    delete res;
-    delete pstmt;
-    delete con;
+    //delete res;
+    //delete pstmt;
+    //delete con;
     return i;
 }
 
@@ -934,9 +1192,9 @@ void view_inspection_requirements(int pnum)
     }
 
 
-    delete res;
-    delete pstmt;
-    delete con;
+    //delete res;
+    //delete pstmt;
+    //delete con;
 }
 
 //SQL Queries for Adding New Inspections
@@ -982,7 +1240,7 @@ double get_sample_size(int insp_num)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("SELECT sample_size FROM Inspections WHERE Insp_pnum = ?");
+    pstmt = con->prepareStatement("SELECT sample_size FROM INSP_REQ WHERE IR_pnum = ?");
     pstmt -> setInt(1, insp_num);
     res = pstmt->executeQuery();
 
@@ -1004,7 +1262,7 @@ void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area) /
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("INSERT INTO INSPECTIONS VALUES(?,?,NULL,NULL,NULL)");
+    pstmt = con->prepareStatement("INSERT INTO INSPECTIONS VALUES(?,?,NULL,FALSE,NULL)");
     pstmt->setInt(1,insp_num);
     pstmt->setInt(2,pn);
     pstmt -> execute();
@@ -1015,8 +1273,8 @@ void add_inspection(int insp_num, int pn, int insp_qty, std::string insp_area) /
     pstmt->setInt(3,insp_qty);
     pstmt->execute();
 
-    delete con;
-    delete pstmt;
+    //delete con;
+    //delete pstmt;
 }
 
 //SQL Queries for Approving Inspections
@@ -1035,7 +1293,7 @@ int get_qty_inspected(int insp_num)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("SELECT qty_inspected FROM INSP_AREA WHERE Insp_pnum = ?");
+    pstmt = con->prepareStatement("SELECT qty_inspected FROM INSP_AREA WHERE Insp_num = ?");
     pstmt -> setInt(1, insp_num);
     res = pstmt->executeQuery();
 
@@ -1044,9 +1302,9 @@ int get_qty_inspected(int insp_num)
        qty_inspected = res->getInt(1);
     }
     
-    delete con;
-    delete pstmt;
-    delete res;
+    //delete con;
+    //delete pstmt;
+    //delete res;
 
     return qty_inspected;
 }
@@ -1060,7 +1318,7 @@ int calculate_fpy(int insp_num)
     sql::ResultSet *res;
     sql::PreparedStatement *pstmt;
 
-    int num_req, qty_passed, i;
+    int num_req, qty_passed, i=0;
     bool passed = false;
     
     driver = get_driver_instance();
@@ -1093,23 +1351,23 @@ int calculate_fpy(int insp_num)
 
     while (res2->next())
     {
-        qty_passed = res2->getInt(i);
+        qty_passed = res2->getInt(1);
 
         if (qty_passed != qty_inspected)
         {
             set_insp_pf(insp_num, false);
         }
         else {  total_req_passed++; } 
-        i++;
+        //i++;
     }
 
     fpy = total_req_passed / num_req;
 
-    delete con;
-    delete res;
-    delete pstmt;
-    delete pstmt2;
-    delete res2;
+    //delete con;
+    //delete res;
+    //delete pstmt;
+    //delete pstmt2;
+    //delete res2;
 
     return fpy;
 }
@@ -1127,15 +1385,15 @@ void set_insp_pf(int insp_num, bool pf)     // VERIFY IF THIS MATCHES
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("UPDATE INSPECTIONS SET pf = ? WHERE Insp_num = ?");
+    pstmt = con->prepareStatement("UPDATE INSPECTIONS SET pass_fail = ? WHERE Insp_num = ?");
     pstmt -> setBoolean(1, pf);
-    pstmt -> setInt(1, insp_num);
+    pstmt -> setInt(2, insp_num);
     res = pstmt->executeQuery();
 
     
-    delete con;
-    delete pstmt;
-    delete res;
+    //delete con;
+    //delete pstmt;
+    //delete res;
 
 }
 
@@ -1162,8 +1420,8 @@ void update_inspection_requirements(int insp_num, int id, std::string time, std:
     pstmt->setInt(4,qty_pass);
     pstmt->execute();
 
-    delete pstmt;
-    delete con;
+    //delete pstmt;
+    //delete con;
 }
 
 std::vector<std::string> get_insp_req(int insp_num)
@@ -1188,9 +1446,9 @@ std::vector<std::string> get_insp_req(int insp_num)
         reqs.push_back(res->getString(1));
     }
 
-    delete pstmt;
-    delete con;
-    delete res;
+    //delete pstmt;
+    //delete con;
+    //delete res;
     return reqs;
 }
 std::vector<std::string> get_insp_res_type(int insp_num)
@@ -1215,9 +1473,9 @@ std::vector<std::string> get_insp_res_type(int insp_num)
         results.push_back(res->getString(1));
     }
 
-    delete pstmt;
-    delete con;
-    delete res;
+    //delete pstmt;
+    //delete con;
+    //delete res;
     return results;
 }
 
@@ -1241,9 +1499,9 @@ std::string get_ir_desc(int insp_num)
     res ->next();
     name = res->getString(1);
 
-    delete pstmt;
-    delete con;
-    delete res;
+    //delete pstmt;
+    //delete con;
+    //delete res;
     return name;
 }
 
@@ -1264,9 +1522,9 @@ int get_insp_pnum(int insp_num)
     res ->next();
     int pnum = res->getInt(1);
 
-    delete pstmt;
-    delete con;
-    delete res;
+    //delete pstmt;
+    //delete con;
+    //delete res;
     return pnum;
 }
 //SQL Queries for Part Number
@@ -1300,10 +1558,10 @@ void add_part(std::string pdesc, int type)
 
     pstmt->execute();
 
-    delete con;
-    delete res;
-    delete pstmt;
-    delete stmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
+    //delete stmt;
 }
 
 void edit_part_name(int pnum, std::string pdesc)
@@ -1323,9 +1581,9 @@ void edit_part_name(int pnum, std::string pdesc)
 
     pstmt->executeUpdate();
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 bool part_exists(int pnum)
@@ -1346,9 +1604,9 @@ bool part_exists(int pnum)
     bool exists = false;
     if(res->next()) exists = true;
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
     return exists;
 }
 
@@ -1363,16 +1621,16 @@ int get_part_id(std::string pname)
     con = driver->connect("tcp://127.0.0.1:3306", "cmpe138", "");
     con->setSchema("InventoryDB");
 
-    pstmt = con->prepareStatement("SELECT P_desc FROM MAT_LOCATIONS WHERE Pr_desc = ?");
+    pstmt = con->prepareStatement("SELECT P_desc FROM PART WHERE P_desc = ?");
     pstmt->setString(1,pname);
     res = pstmt->executeQuery();
 
     int id = 0;
     if(res->next()) id = res->getInt(1);
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 
     return id;
 }
@@ -1395,9 +1653,9 @@ int get_part_type(int pnum)
 
     int type = res->getInt(1);
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 
     return type;
 }
@@ -1420,9 +1678,9 @@ std::string get_part_name(int pnum)
 
     std::string name = res->getString(1);
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 
     return name;
 }
@@ -1449,9 +1707,9 @@ void add_part_supplier(int pnum, int supp_num, std::string supp_name)
 
     pstmt->execute();
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 void edit_part_supplier(int pnum, int supp_num, std::string supp_name)
@@ -1472,9 +1730,9 @@ void edit_part_supplier(int pnum, int supp_num, std::string supp_name)
 
     pstmt->executeUpdate();
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 int get_parts_needed(int pnum,int mat_num)
@@ -1492,13 +1750,12 @@ int get_parts_needed(int pnum,int mat_num)
     pstmt->setInt(1,pnum);
     pstmt->setInt(2,mat_num);
     res = pstmt->executeQuery();
-    res->next();
+    int qty = 0;
+    if(res->next()) qty = res->getInt(1);
 
-    int qty = res->getInt(1);
-
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 
     return qty;
 }
@@ -1524,9 +1781,9 @@ void add_part_location(int pnum, int INSP, int STORES, int WIP, int QC, int FGI)
 
     pstmt -> execute();
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 void edit_part_location(int pnum, int INSP, int STORES, int WIP, int QC, int FGI)
@@ -1550,9 +1807,9 @@ void edit_part_location(int pnum, int INSP, int STORES, int WIP, int QC, int FGI
 
     pstmt -> executeUpdate();
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 bool part_loc_exists(int pnum)
@@ -1573,9 +1830,9 @@ bool part_loc_exists(int pnum)
     bool exists = false;
     if(res->next()) exists = true;
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
     return exists;
 }
 
@@ -1596,9 +1853,9 @@ int get_insp_count(int pnum)
 
     int count = res->getInt(1);
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
     return count;
 }
 
@@ -1617,11 +1874,12 @@ int get_stores_count(int pnum)
     pstmt->setInt(1,pnum);
     res = pstmt->executeQuery();
 
-    int count = res->getInt(1);
+    int count = 0;
+    if(res->next())count = res->getInt(1);
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
     return count;
 }
 
@@ -1639,12 +1897,13 @@ int get_wip_count(int pnum)
     pstmt = con->prepareStatement("SELECT WIP FROM PART_LOCATION WHERE P_num = ?");
     pstmt->setInt(1,pnum);
     res = pstmt->executeQuery();
+    
+    int count = 0;
+    if(res->next()) count = res->getInt(1);
 
-    int count = res->getInt(1);
-
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
     return count;
 }
 int get_qc_count(int pnum)
@@ -1664,9 +1923,9 @@ int get_qc_count(int pnum)
 
     int count = res->getInt(1);
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
     return count;
 }
 int get_fgi_count(int pnum)
@@ -1686,9 +1945,9 @@ int get_fgi_count(int pnum)
 
     int count = res->getInt(1);
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
     return count;
 }
 
@@ -1719,9 +1978,9 @@ void add_kit(int pr_num,std::vector<int>&mat_list,std::vector<int>&qty)
         pstmt->execute();
     }
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 int get_mat_quantity(int pr_num,int mat_num)
@@ -1739,13 +1998,12 @@ int get_mat_quantity(int pr_num,int mat_num)
     pstmt -> setInt(1,mat_num);
     pstmt->setInt(2,pr_num);
     res = pstmt->executeQuery();
-    res->next();
+    int qty = 0;
+    if(res->next()) qty = res->getInt(1);
 
-    int qty = res->getInt(1);
-
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
     return qty;
 }
 
@@ -1766,9 +2024,9 @@ void create_requirements(int pnum, std::string requirement, std::string insp_are
     pstmt->setString(4,res_type);
     pstmt->execute();
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 void create_insp_req(int pnum, std::string pdesc,int sample_size)
@@ -1788,9 +2046,9 @@ void create_insp_req(int pnum, std::string pdesc,int sample_size)
     pstmt->setInt(3,sample_size);
     pstmt->execute();
 
-    delete con;
-    delete res;
-    delete pstmt;
+    //delete con;
+    //delete res;
+    //delete pstmt;
 }
 
 /* ------------------------- SQL Queries to move parts through INSP to FGI -------------------------- */
@@ -1806,7 +2064,7 @@ void move_INSP_to_STORES(int p_num, int qty)
     con->setSchema("InventoryDB");
 
     //subtract from original location and add to STORES
-    pstmt = con->prepareStatement("UPDATE PART_LOCATIONS SET INSP = INSP - ? AND STORES = STORES + ? WHERE P_num = ?");
+    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET INSP = INSP - ? AND STORES = STORES + ? WHERE P_num = ?");
     pstmt -> setInt(1, qty);
     pstmt -> setInt(2, qty);
     pstmt -> setInt(3, p_num);
@@ -1814,9 +2072,9 @@ void move_INSP_to_STORES(int p_num, int qty)
 
     std::cout << qty << " of part number " << p_num << " has been moved from INSP into STORES.\n";
 
-    delete con;
-    delete pstmt;
-    delete res;
+    //delete con;
+    //delete pstmt;
+    //delete res;
 }
 
 void move_STORES_to_WIP(int p_num, int qty)
@@ -1831,7 +2089,7 @@ void move_STORES_to_WIP(int p_num, int qty)
     con->setSchema("InventoryDB");
 
     //subtract from original location and add to WIP
-    pstmt = con->prepareStatement("UPDATE PART_LOCATIONS SET STORES = STORES - ? AND WIP = WIP + ? WHERE P_num = ?");
+    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET STORES = STORES - ? AND WIP = WIP + ? WHERE P_num = ?");
     pstmt -> setInt(1, qty);
     pstmt -> setInt(2, qty);
     pstmt -> setInt(3, p_num);
@@ -1839,9 +2097,9 @@ void move_STORES_to_WIP(int p_num, int qty)
 
     std::cout << qty << " of part number " << p_num << " has been moved from STORES into WIP.\n";
 
-    delete con;
-    delete pstmt;
-    delete res;
+    //delete con;
+    //delete pstmt;
+    //delete res;
 }
 
 void move_WIP_to_QC(int p_num, int qty)
@@ -1856,7 +2114,7 @@ void move_WIP_to_QC(int p_num, int qty)
     con->setSchema("InventoryDB");
 
     //subtract from original location and add to QC
-    pstmt = con->prepareStatement("UPDATE PART_LOCATIONS SET WIP = WIP - ? AND QC = QC + ? WHERE P_num = ?");
+    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET WIP = WIP - ? AND QC = QC + ? WHERE P_num = ?");
     pstmt -> setInt(1, qty);
     pstmt -> setInt(2, qty);
     pstmt -> setInt(3, p_num);
@@ -1864,9 +2122,9 @@ void move_WIP_to_QC(int p_num, int qty)
 
     std::cout << qty << " of part number " << p_num << " has been moved from WIP into QC.\n";
 
-    delete con;
-    delete pstmt;
-    delete res;
+    //delete con;
+    //delete pstmt;
+    //delete res;
 }
 
 void move_QC_to_FGI(int p_num, int qty)
@@ -1881,7 +2139,7 @@ void move_QC_to_FGI(int p_num, int qty)
     con->setSchema("InventoryDB");
 
     //subtract from original location and add to FGI
-    pstmt = con->prepareStatement("UPDATE PART_LOCATIONS SET QC = QC - ? AND FGI = FGI + ? WHERE P_num = ?");
+    pstmt = con->prepareStatement("UPDATE PART_LOCATION SET QC = QC - ? AND FGI = FGI + ? WHERE P_num = ?");
     pstmt -> setInt(1, qty);
     pstmt -> setInt(2, qty);
     pstmt -> setInt(3, p_num);
@@ -1889,9 +2147,9 @@ void move_QC_to_FGI(int p_num, int qty)
 
     std::cout << qty << " of part number " << p_num << " has been moved from QC into FGI.\n";
 
-    delete con;
-    delete pstmt;
-    delete res;
+    //delete con;
+    //delete pstmt;
+    //delete res;
 }
 
 
@@ -1903,43 +2161,47 @@ void state_init()
     create_dept(2, "Quality");
     create_dept(3, "Operations");
     create_dept(4, "Engineering");
-    //departments must be created first before assigning to employees
 
     //create departments
-    create_user("123456789", "wdoe1", sha256("dsfsdfs"), "Doe", "Willie");
+    create_user("123456789", "wdoe1", sha256("wdoe1"), "Doe", "Willie");
     assign_dept(1, 2);
     assign_role(1, "IQC Inspector");
 
-    create_user("111222333", "esmith5", sha256("afwf345j"), "Smith", "Eddie");
+    create_user("111222333", "esmith5", sha256("esmith5"), "Smith", "Eddie");
     assign_dept(2, 2);
-    assign_role(1, "OQC Inspector");
+    assign_role(2, "OQC Inspector");
 
-    create_user("444555666", "kmunoz2", sha256("df456sd"), "Munoz", "Kara");
+    create_user("444555666", "kmunoz2", sha256("kmunoz2"), "Munoz", "Kara");
     assign_dept(3, 2);
-    assign_role(1, "QA Director");
+    assign_role(3, "QA Director");
 
-    create_user("777888999", "csharma1", sha256("g5m1y6u"), "Sharma", "Chas");
+    create_user("777888999", "csharma1", sha256("csharma1"), "Sharma", "Chas");
     assign_dept(4, 3);
-    assign_role(1, "Inventory Associate");
+    assign_role(4, "Inventory Associate");
 
-    create_user("453453453", "lpeterson1", sha256("65r4h6wr6"), "Peterson", "Laila");
+    create_user("453453453", "lpeterson1", sha256("lpeterson1"), "Peterson", "Laila");
     assign_dept(5, 1);
-    assign_role(1, "CEO");
+    assign_role(5, "CEO");
 
-    create_user("786786786", "oreid1", sha256("rge56r"), "Reid", "Owen");
+    create_user("786786786", "oreid1", sha256("oreid1"), "Reid", "Owen");
     assign_dept(6, 3);
-    assign_role(1, "Technician");
+    assign_role(6, "Technician");
 
-    create_user("654987321", "sadil1", sha256("t1n5w6"), "Adil", "Syed");
+    create_user("654987321", "sadil1", sha256("sadil1"), "Adil", "Syed");
     assign_dept(7, 4);
-    assign_role(1, "Engineering Manager");
+    assign_role(7, "Engineering Manager");
 
-    create_user("123456789", "mli7", sha256("nrt41n"), "Li", "Mei");
+    create_user("123456789", "mli7", sha256("mli7"), "Li", "Mei");
     assign_dept(8, 3);
-    assign_role(1, "Operations Manager");
+    assign_role(8, "Operations Manager");
+
+    create_user("123456789", "admin", sha256("admin"), "Min", "Addi");
+    assign_dept(9, 1);
+    assign_role(9, "Administrator");
 
     assign_dept_mgr(4,7);
     assign_dept_mgr(3,8);
+    assign_dept_mgr(1,9);
 
     //assign_emp_id();
     //get_emp_id("123456789");

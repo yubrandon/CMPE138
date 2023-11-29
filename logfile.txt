@@ -1,21 +1,143 @@
-[2023-11-27 20:53:31.392] [create_account_1] [info] start
-[2023-11-27 20:53:38.833] [create_account_1] [info] complete
+[2023-11-28 15:13:17.703] [User: admin (ADMIN)session_1] [info] start
+[2023-11-28 15:13:19.045] [User: admin (ADMIN)session_1] [info] viewed unassigned employees
+[2023-11-28 15:14:18.777] [User: admin (ADMIN)session_1] [info] end
+[2023-11-28 15:13:15.909] [login_2] [info] start
+[2023-11-28 15:13:17.703] [login_2] [info] complete
 
-[2023-11-27 20:53:39.837] [login_1] [info] start
-[2023-11-27 23:47:38.448] [create_account_1] [info] start
-[2023-11-27 23:47:54.305] [create_account_1] [info] complete
+[2023-11-28 15:13:11.232] [login_1] [info] start
+[2023-11-28 15:13:14.292] [login_1] [info] complete
 
-[2023-11-27 23:48:52.076] [create_account_2] [info] start
-[2023-11-27 23:49:08.668] [create_account_2] [info] complete
+[2023-11-28 15:12:57.912] [create_account_1] [info] start
+[2023-11-28 15:13:10.121] [create_account_1] [info] complete
 
-[2023-11-27 23:48:34.643] [create_account_1] [info] start
-[2023-11-27 23:48:47.686] [create_account_1] [info] complete
+[2023-11-28 15:15:45.059] [User: admin (ADMIN)session_1] [info] start
+[2023-11-28 15:15:46.560] [User: admin (ADMIN)session_1] [info] viewed unassigned employees
+[2023-11-28 15:16:36.046] [User: admin (ADMIN)session_1] [info] viewed roleless employees
+[2023-11-28 15:16:37.463] [User: admin (ADMIN)session_1] [info] viewed unassigned employees
+[2023-11-28 15:17:06.534] [User: admin (ADMIN)session_1] [info] end
+[2023-11-28 15:15:42.843] [login_1] [info] start
+[2023-11-28 15:15:45.059] [login_1] [info] complete
 
-[2023-11-28 00:30:39.445] [create_account_1] [info] start
-[2023-11-28 00:30:49.321] [create_account_1] [info] complete
+[2023-11-28 15:15:19.929] [create_account_1] [info] start
+[2023-11-28 15:15:21.684] [create_account_1] [info] invalid ssn input
+[2023-11-28 15:15:29.669] [create_account_1] [info] complete
 
-[2023-11-28 00:36:19.717] [login_1] [info] start
-[2023-11-28 00:36:24.583] [login_1] [info] invalid username input
-[2023-11-28 00:36:29.128] [login_1] [info] invalid username input
-[2023-11-28 00:36:32.700] [login_1] [info] invalid username input
-[2023-11-28 00:36:34.023] [login_1] [info] exit at username input
+[2023-11-28 15:17:32.377] [User: admin (ADMIN)session_1] [info] start
+[2023-11-28 15:17:33.097] [User: admin (ADMIN)session_1] [info] viewed unassigned employees
+[2023-11-28 15:18:37.817] [User: admin (ADMIN)session_1] [info] end
+[2023-11-28 15:17:29.383] [login_2] [info] start
+[2023-11-28 15:17:32.377] [login_2] [info] complete
+
+[2023-11-28 15:17:25.836] [login_1] [info] start
+[2023-11-28 15:17:27.370] [login_1] [info] complete
+
+[2023-11-28 15:17:19.048] [create_account_1] [info] start
+[2023-11-28 15:17:25.042] [create_account_1] [info] complete
+
+[2023-11-28 15:19:00.175] [User: admin (ADMIN)session_1] [info] start
+[2023-11-28 15:19:01.174] [User: admin (ADMIN)session_1] [info] viewed unassigned employees
+[2023-11-28 15:19:32.169] [User: admin (ADMIN)session_1] [info] end
+[2023-11-28 15:18:58.869] [login_2] [info] start
+[2023-11-28 15:19:00.175] [login_2] [info] complete
+
+[2023-11-28 15:18:54.739] [login_1] [info] start
+[2023-11-28 15:18:57.483] [login_1] [info] complete
+
+[2023-11-28 15:18:49.752] [create_account_1] [info] start
+[2023-11-28 15:18:54.190] [create_account_1] [info] complete
+
+[2023-11-28 15:19:49.277] [User: admin (ADMIN)session_1] [info] start
+[2023-11-28 15:19:49.501] [User: admin (ADMIN)session_1] [info] viewed unassigned employees
+[2023-11-28 15:20:37.828] [User: admin (ADMIN)session_1] [info] viewed unassigned employees
+[2023-11-28 15:21:35.312] [User: admin (ADMIN)session_1] [info] end
+[2023-11-28 15:19:47.275] [login_1] [info] start
+[2023-11-28 15:19:49.277] [login_1] [info] complete
+
+[2023-11-28 15:19:42.757] [create_account_1] [info] start
+[2023-11-28 15:19:46.698] [create_account_1] [info] complete
+
+[2023-11-28 15:21:47.464] [create_account_1] [info] start
+[2023-11-28 15:21:52.022] [create_account_1] [info] complete
+
+[2023-11-28 15:21:52.640] [login_1] [info] start
+[2023-11-28 15:21:54.767] [login_1] [info] complete
+
+[2023-11-28 15:21:54.767] [User: admin (ADMIN)session_1] [info] start
+[2023-11-28 15:21:55.323] [User: admin (ADMIN)session_1] [info] viewed unassigned employees
+[2023-11-28 15:22:16.822] [User: admin (ADMIN)session_1] [info] viewed department roster
+[2023-11-28 15:22:27.610] [User: admin (ADMIN)session_1] [info] end
+[2023-11-28 15:23:00.122] [login_2] [info] start
+[2023-11-28 15:23:02.792] [login_2] [info] complete
+
+[2023-11-28 15:23:02.793] [User: admin (ADMIN)session_2] [info] start
+[2023-11-28 15:23:05.977] [User: admin (ADMIN)session_2] [info] edited employee department
+[2023-11-28 15:23:05.977] [User: admin (ADMIN)session_2] [info] pulled work order
+[2023-11-28 15:26:51.601] [User: admin (ADMIN)session_1] [info] start
+[2023-11-28 15:26:53.363] [User: admin (ADMIN)session_1] [info] edited employee role
+[2023-11-28 15:27:37.723] [User: admin (ADMIN)session_1] [info] end
+[2023-11-28 15:26:49.393] [login_1] [info] start
+[2023-11-28 15:26:51.601] [login_1] [info] complete
+
+[2023-11-28 15:26:43.497] [create_account_1] [info] start
+[2023-11-28 15:26:48.486] [create_account_1] [info] complete
+
+[2023-11-28 15:29:37.145] [User: admin (ADMIN)session_1] [info] start
+[2023-11-28 15:29:39.608] [User: admin (ADMIN)session_1] [info] edited employee role
+[2023-11-28 15:29:52.207] [User: admin (ADMIN)session_1] [info] end
+[2023-11-28 15:29:35.259] [login_1] [info] start
+[2023-11-28 15:29:37.145] [login_1] [info] complete
+
+[2023-11-28 15:29:28.462] [create_account_1] [info] start
+[2023-11-28 15:29:34.218] [create_account_1] [info] complete
+
+[2023-11-28 15:31:38.196] [User: test (IQC)session_1] [info] start
+[2023-11-28 15:31:40.184] [User: test (IQC)session_1] [info] end
+[2023-11-28 15:31:03.558] [User: admin (ADMIN)session_1] [info] start
+[2023-11-28 15:31:19.792] [User: admin (ADMIN)session_1] [info] edited employee role
+[2023-11-28 15:31:33.324] [User: admin (ADMIN)session_1] [info] end
+[2023-11-28 15:30:59.839] [login_2] [info] start
+[2023-11-28 15:31:03.558] [login_2] [info] complete
+
+[2023-11-28 15:31:34.395] [login_3] [info] start
+[2023-11-28 15:31:38.196] [login_3] [info] complete
+
+[2023-11-28 15:30:47.295] [create_account_1] [info] start
+[2023-11-28 15:30:58.501] [create_account_1] [info] complete
+
+[2023-11-28 15:30:34.914] [login_1] [info] start
+[2023-11-28 15:30:36.658] [login_1] [info] invalid username input
+[2023-11-28 15:30:42.803] [login_1] [info] invalid username input
+[2023-11-28 15:30:45.675] [login_1] [info] exit at username input
+[2023-11-28 15:36:31.752] [login_1] [info] start
+[2023-11-28 15:36:35.467] [login_1] [info] complete
+
+[2023-11-28 15:36:35.467] [User: wdoe1 (IQC)session_1] [info] start
+[2023-11-28 15:36:46.944] [User: wdoe1 (IQC)session_1] [info] viewed inventory
+[2023-11-28 15:37:15.003] [User: wdoe1 (IQC)session_1] [info] viewed inspections
+[2023-11-28 15:43:26.274] [User: csharma1 (IQC)session_1] [info] start
+[2023-11-28 15:43:30.852] [User: csharma1 (IQC)session_1] [info] viewed inventory
+[2023-11-28 15:43:39.001] [User: csharma1 (IQC)session_1] [info] received part
+[2023-11-28 15:44:12.557] [User: csharma1 (IQC)session_1] [info] received part
+[2023-11-28 15:44:39.356] [User: csharma1 (IQC)session_1] [info] added inspection
+[2023-11-28 15:44:39.356] [User: csharma1 (IQC)session_1] [info] pulled work order
+[2023-11-28 15:46:54.908] [User: csharma1 (IQC)session_1] [info] backflushed product
+[2023-11-28 15:48:12.089] [User: csharma1 (IQC)session_1] [info] end
+[2023-11-28 15:43:16.180] [login_2] [info] start
+[2023-11-28 15:43:26.274] [login_2] [info] complete
+
+[2023-11-28 15:37:22.216] [login_1] [info] start
+[2023-11-28 15:37:24.663] [login_1] [info] complete
+
+[2023-11-28 15:37:24.664] [User: wdoe1 (IQC)session_1] [info] start
+[2023-11-28 15:38:10.670] [User: wdoe1 (IQC)session_1] [info] added inspection
+[2023-11-28 15:40:39.088] [User: wdoe1 (IQC)session_1] [info] approved inspection
+[2023-11-28 16:04:34.816] [login_1] [info] start
+[2023-11-28 16:04:37.313] [login_1] [info] complete
+
+[2023-11-28 16:04:37.314] [User: wdoe1 (IQC)session_1] [info] start
+[2023-11-28 16:04:38.771] [User: wdoe1 (IQC)session_1] [info] viewed inspections
+[2023-11-28 16:06:15.264] [login_1] [info] start
+[2023-11-28 16:06:16.664] [login_1] [info] complete
+
+[2023-11-28 16:06:16.665] [User: wdoe1 (IQC)session_1] [info] start
+[2023-11-28 16:06:17.907] [User: wdoe1 (IQC)session_1] [info] viewed inspections

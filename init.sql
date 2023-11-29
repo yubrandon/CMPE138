@@ -23,7 +23,7 @@ CREATE TABLE EMPLOYEE(
 CREATE TABLE EMPLOYEE_INFO(
     ID int,
     Dno int,
-    Job_title varchar(10),
+    Job_title varchar(50),
     CONSTRAINT EMP_ID_FK FOREIGN KEY (ID) REFERENCES EMPLOYEE(ID) ON DELETE SET NULL ON UPDATE CASCADE 
 );
 
@@ -95,7 +95,7 @@ CREATE TABLE INSPECTIONS(
 CREATE TABLE INSP_AREA(
     Insp_num int,
     Insp_area varchar(5),
-    Qty int,
+    Qty_inspected int,
     CONSTRAINT INSP_AREA_FK FOREIGN KEY (Insp_num) REFERENCES INSPECTIONS (Insp_num) ON DELETE SET NULL ON UPDATE CASCADE
 );
 

@@ -40,6 +40,7 @@ void loginas_OQC_inspector();
 void loginas_QAdirector();
 void loginas_inv_associate();
 void loginas_technician();
+void loginas_administrator();
 
 /* ------------------------------------------- MENU DISPLAY FUNCTIONS -------------------------------------------------- */
 void display_IQCinsp_menu();
@@ -47,6 +48,7 @@ void display_OQCinsp_menu();
 void display_QAdir_menu();
 void display_invassoc_menu();
 void display_tech_menu();
+void display_admin_menu();
 
 /* ------------------------------------------- VIEW MENU FUNCTIONS ----------------------------------------------------- */
 void view_all_inventory();
@@ -62,6 +64,9 @@ void pull_wo_menu();
 void view_IPQC_inspections();
 void view_OQC_inspections(); 
 void view_FQC_inspections();
+void view_department_menu();
+void assign_dept_menu();
+void assign_role_menu();
 
 /* ------------------------------------------- ADD MENU FUNCTIONS ----------------------------------------------------- */
 void add_new_inspection(std::string dept_name, std::string title);
